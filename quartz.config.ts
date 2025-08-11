@@ -25,7 +25,10 @@ const config: QuartzConfig = {
       typography: {
         header: "Nanum Gothic",
         body: "Nanum Gothic",
-        code: "Roboto Mono",
+        code: {
+          name: "Nanum Gothic Coding",
+          weights: [400, 700],  
+        },
       },
       colors: {
         lightMode: {
