@@ -1,3 +1,23 @@
 @use "./base.scss";
 
 // put your custom CSS here!
+body 
+{
+    line-height: 2 !important;
+}  
+
+img[alt*="center"]
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img[alt*="right"] 
+{
+    float: right;
+    clear: right;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
