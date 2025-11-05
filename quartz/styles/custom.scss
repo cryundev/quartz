@@ -1,10 +1,10 @@
 @use "./base.scss";
 
 // put your custom CSS here!
-body 
+body
 {
     line-height: 2 !important;
-}  
+}
 
 img[alt*="center"]
 {
@@ -13,11 +13,35 @@ img[alt*="center"]
     margin-right: auto;
 }
 
-img[alt*="right"] 
+img[alt*="right"]
 {
     float: right;
     clear: right;
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+// Explorer file links font size
+.explorer-content ul li > a {
+    font-size: 0.85rem !important;
+}
+
+// Folder page list font size
+.section-ul .section-li .section .desc h3 {
+    font-size: 0.85rem !important;
+}
+
+.section-ul .section-li .section .meta {
+    font-size: 0.85rem !important;
+}
+
+// Hide tags in folder page list
+.section-ul .section-li .section .tags {
+    display: none !important;
+}
+
+// Increase page max-width
+.page {
+    max-width: 1900px !important;
 }

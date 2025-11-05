@@ -24,10 +24,10 @@ const config: QuartzConfig = {
       cdnCaching: true,
       typography: {
         header: "Nanum Gothic",
-        body: "Nanum Gothic",
+        body: "Noto Sans KR",
         code: {
-          name: "Nanum Gothic Coding",
-          weights: [400, 700],  
+          name: "Roboto Mono",
+          weights: [400, 700],
         },
       },
       colors: {
