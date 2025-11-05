@@ -25,6 +25,18 @@ img[alt*="right"]
 // Explorer file links font size
 .explorer-content ul li > a {
     font-size: 0.85rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+// Explorer folder titles - prevent wrapping
+.folder-container div > button span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
 }
 
 // Folder page list font size
