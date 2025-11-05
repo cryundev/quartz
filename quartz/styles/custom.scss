@@ -45,3 +45,45 @@ img[alt*="right"]
 .page {
     max-width: 1900px !important;
 }
+
+// Heading colors for light mode
+article h2 {
+    color: #D97706 !important;
+}
+
+article h3 {
+    color: #C2410C !important;
+}
+
+article h4 {
+    color: #2563EB !important;
+}
+
+article h5 {
+    color: #1E40AF !important;
+}
+
+article h6 {
+    color: #7C3AED !important;
+}
+
+// Heading colors for dark mode
+[saved-theme="dark"] article h2 {
+    color: #FF9F4A !important;
+}
+
+[saved-theme="dark"] article h3 {
+    color: #FF8111 !important;
+}
+
+[saved-theme="dark"] article h4 {
+    color: #9FBDFF !important;
+}
+
+[saved-theme="dark"] article h5 {
+    color: #79A4FF !important;
+}
+
+[saved-theme="dark"] article h6 {
+    color: #D8AAFF !important;
+}
