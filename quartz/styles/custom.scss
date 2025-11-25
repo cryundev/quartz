@@ -99,3 +99,8 @@ article h6 {
 [saved-theme="dark"] article h6 {
     color: #D8AAFF !important;
 }
+
+// Table width - always 100%
+.table-container > table {
+    width: 100% !important;
+}
