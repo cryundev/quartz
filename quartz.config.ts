@@ -8,24 +8,27 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Quartz 4",
+    pageTitle: "Cryun's WIKI",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
       provider: "plausible",
     },
-    locale: "en-US",
-    baseUrl: "quartz.jzhao.xyz",
+    locale: "ko-KR",
+    baseUrl: "wiki.cryun.pe.kr",
     ignorePatterns: ["private", "templates", ".obsidian"],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
       cdnCaching: true,
       typography: {
-        header: "Schibsted Grotesk",
-        body: "Source Sans Pro",
-        code: "IBM Plex Mono",
+        header: "Nanum Gothic",
+        body: "Noto Sans KR",
+        code: {
+          name: "Roboto Mono",
+          weights: [400, 700],
+        },
       },
       colors: {
         lightMode: {
@@ -40,11 +43,11 @@ const config: QuartzConfig = {
           textHighlight: "#fff23688",
         },
         darkMode: {
-          light: "#161618",
+          light: "#1e1e1e",
           lightgray: "#393639",
           gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
+          darkgray: "#dcdcdc",
+          dark: "#dcdcdc",
           secondary: "#7b97aa",
           tertiary: "#84a59d",
           highlight: "rgba(143, 159, 169, 0.15)",
