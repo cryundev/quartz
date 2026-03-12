@@ -69,6 +69,8 @@ export default ((userOpts?: Partial<Options>) => {
         data-behavior={opts.folderClickBehavior}
         data-collapsed={opts.folderDefaultState}
         data-savestate={opts.useSavedState}
+        data-parent-label={cfg.locale?.startsWith("ko") ? "상위 폴더" : "Up One Level"}
+        data-root-label={cfg.locale?.startsWith("ko") ? "최상위 폴더" : "Top Level"}
         data-data-fns={JSON.stringify({
           order: opts.order,
           sortFn: opts.sortFn.toString(),
@@ -120,7 +122,17 @@ export default ((userOpts?: Partial<Options>) => {
           </svg>
         </button>
         <div id={id} class="explorer-content" aria-expanded={false} role="group">
-          <OverflowList class="explorer-ul" />
+          <OverflowList class="explorer-ul">
+            <li class="explorer-parent-item">
+              <a
+                class="explorer-parent is-disabled"
+                aria-disabled={true}
+                title={cfg.locale?.startsWith("ko") ? "최상위 폴더" : "Top Level"}
+              >
+                ..
+              </a>
+            </li>
+          </OverflowList>
         </div>
         <template id="template-file">
           <li>

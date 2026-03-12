@@ -1,5 +1,5 @@
 import { FileTrieNode } from "../../util/fileTrie"
-import { FullSlug, resolveRelative, simplifySlug } from "../../util/path"
+import { FullSlug, resolveRelative } from "../../util/path"
 import { ContentDetails } from "../../plugins/emitters/contentIndex"
 
 type MaybeHTMLElement = HTMLElement | undefined
@@ -20,6 +20,20 @@ type FolderState = {
 }
 
 let currentExplorerState: Array<FolderState>
+
+function getCurrentFolderSegments(currentSlug: FullSlug): string[] {
+  const segments = currentSlug.split("/").filter((segment) => segment.length > 0)
+  if (segments.length === 0) {
+    return []
+  }
+
+  if (segments.at(-1) === "index") {
+    return segments.slice(0, -1)
+  }
+
+  return segments.slice(0, -1)
+}
+
 function toggleExplorer(this: HTMLElement) {
   const nearestExplorer = this.closest(".explorer") as HTMLElement
   if (!nearestExplorer) return
@@ -95,69 +109,61 @@ function createFileNode(currentSlug: FullSlug, node: FileTrieNode): HTMLLIElemen
   return li
 }
 
-function createFolderNode(
-  currentSlug: FullSlug,
-  node: FileTrieNode,
-  opts: ParsedOptions,
-): HTMLLIElement {
-  const template = document.getElementById("template-folder") as HTMLTemplateElement
-  const clone = template.content.cloneNode(true) as DocumentFragment
-  const li = clone.querySelector("li") as HTMLLIElement
-  const folderContainer = li.querySelector(".folder-container") as HTMLElement
-  const titleContainer = folderContainer.querySelector("div") as HTMLElement
-  const folderOuter = li.querySelector(".folder-outer") as HTMLElement
-  const ul = folderOuter.querySelector("ul") as HTMLUListElement
-
-  const folderPath = node.slug
-  folderContainer.dataset.folderpath = folderPath
-
-  if (currentSlug === folderPath) {
-    folderContainer.classList.add("active")
-  }
-
-  if (opts.folderClickBehavior === "link") {
-    // Replace button with link for link behavior
-    const button = titleContainer.querySelector(".folder-button") as HTMLElement
-    const a = document.createElement("a")
-    a.href = resolveRelative(currentSlug, folderPath)
-    a.dataset.for = folderPath
-    a.className = "folder-title"
-    a.textContent = node.displayName
-    button.replaceWith(a)
-  } else {
-    const span = titleContainer.querySelector(".folder-title") as HTMLElement
-    span.textContent = node.displayName
-  }
-
-  // if the saved state is collapsed or the default state is collapsed
-  const isCollapsed =
-    currentExplorerState.find((item) => item.path === folderPath)?.collapsed ??
-    opts.folderDefaultState === "collapsed"
-
-  // if this folder is a prefix of the current path we
-  // want to open it anyways
-  const simpleFolderPath = simplifySlug(folderPath)
-  const folderIsPrefixOfCurrentSlug =
-    simpleFolderPath === currentSlug.slice(0, simpleFolderPath.length)
-
-  if (!isCollapsed || folderIsPrefixOfCurrentSlug) {
-    folderOuter.classList.add("open")
-  }
-
-  for (const child of node.children) {
-    const childNode = child.isFolder
-      ? createFolderNode(currentSlug, child, opts)
-      : createFileNode(currentSlug, child)
-    ul.appendChild(childNode)
-  }
-
+function createFolderLinkNode(currentSlug: FullSlug, node: FileTrieNode): HTMLLIElement {
+  const li = createFileNode(currentSlug, node)
+  const a = li.querySelector("a") as HTMLAnchorElement
+  a.classList.add("folder-link")
   return li
+}
+
+function clearExplorer(explorer: HTMLElement) {
+  const explorerUl = explorer.querySelector(".explorer-ul")
+  if (!explorerUl) return
+
+  for (const child of Array.from(explorerUl.children)) {
+    if (
+      !child.classList.contains("overflow-end") &&
+      !child.classList.contains("explorer-parent-item")
+    ) {
+      child.remove()
+    }
+  }
+}
+
+function updateParentLink(explorer: HTMLElement, currentSlug: FullSlug, folderSegments: string[]) {
+  const parentLink = explorer.querySelector(".explorer-parent") as HTMLAnchorElement | null
+  if (!parentLink) return
+
+  const parentLabel = explorer.dataset.parentLabel ?? "← Up One Level"
+  const rootLabel = explorer.dataset.rootLabel ?? "Top Level"
+
+  if (folderSegments.length === 0) {
+    parentLink.textContent = ".."
+    parentLink.title = rootLabel
+    parentLink.classList.add("is-disabled")
+    parentLink.removeAttribute("href")
+    parentLink.setAttribute("aria-disabled", "true")
+    return
+  }
+
+  const parentSegments = folderSegments.slice(0, -1)
+  const parentSlug = (parentSegments.length === 0
+    ? "index"
+    : `${parentSegments.join("/")}/index`) as FullSlug
+
+  parentLink.textContent = ".."
+  parentLink.title = parentLabel
+  parentLink.href = resolveRelative(currentSlug, parentSlug)
+  parentLink.classList.remove("is-disabled")
+  parentLink.setAttribute("aria-disabled", "false")
 }
 
 async function setupExplorer(currentSlug: FullSlug) {
   const allExplorers = document.querySelectorAll("div.explorer") as NodeListOf<HTMLElement>
 
   for (const explorer of allExplorers) {
+    clearExplorer(explorer)
+
     const dataFns = JSON.parse(explorer.dataset.dataFns || "{}")
     const opts: ParsedOptions = {
       folderClickBehavior: (explorer.dataset.behavior || "collapse") as "collapse" | "link",
@@ -195,8 +201,12 @@ async function setupExplorer(currentSlug: FullSlug) {
       }
     }
 
+    const currentFolderSegments = getCurrentFolderSegments(currentSlug)
+    const visibleRoot = trie.findNode(currentFolderSegments) ?? trie
+    updateParentLink(explorer, currentSlug, currentFolderSegments)
+
     // Get folder paths for state management
-    const folderPaths = trie.getFolderPaths()
+    const folderPaths = visibleRoot.getFolderPaths()
     currentExplorerState = folderPaths.map((path) => {
       const previousState = oldIndex.get(path)
       return {
@@ -211,14 +221,15 @@ async function setupExplorer(currentSlug: FullSlug) {
 
     // Create and insert new content
     const fragment = document.createDocumentFragment()
-    for (const child of trie.children) {
+    for (const child of visibleRoot.children) {
       const node = child.isFolder
-        ? createFolderNode(currentSlug, child, opts)
+        ? createFolderLinkNode(currentSlug, child)
         : createFileNode(currentSlug, child)
 
       fragment.appendChild(node)
     }
-    explorerUl.insertBefore(fragment, explorerUl.firstChild)
+    const parentItem = explorerUl.querySelector(".explorer-parent-item")
+    explorerUl.insertBefore(fragment, parentItem?.nextSibling ?? explorerUl.firstChild)
 
     // restore explorer scrollTop position if it exists
     const scrollTop = sessionStorage.getItem("explorerScrollTop")

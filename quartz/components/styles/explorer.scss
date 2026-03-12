@@ -160,6 +160,47 @@ button.desktop-explorer {
   }
 }
 
+.explorer-parent-item {
+  margin-bottom: 0.35rem;
+}
+
+.explorer-content .folder-link,
+.explorer-content .explorer-parent {
+  position: relative;
+  display: inline-block;
+  padding-left: 1.15rem;
+  font-family: var(--headerFont);
+  font-weight: $semiBoldWeight;
+  color: var(--secondary);
+}
+
+.explorer-content .folder-link:hover,
+.explorer-content .explorer-parent:hover {
+  color: var(--tertiary);
+}
+
+.explorer-content .folder-link::before,
+.explorer-content .explorer-parent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--secondary) 75%, var(--light));
+}
+
+.explorer-content .explorer-parent.is-disabled {
+  color: var(--gray);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.explorer-content .explorer-parent.is-disabled::before {
+  background: color-mix(in srgb, var(--gray) 75%, var(--light));
+}
+
 .folder-container {
   flex-direction: row;
   display: flex;
@@ -259,6 +300,11 @@ li:has(> .folder-outer:not(.open)) > .folder-container > svg {
       height: 100dvh;
       max-height: 100dvh;
       visibility: hidden;
+    }
+
+    .explorer-parent {
+      margin-left: 1rem;
+      margin-right: 1rem;
     }
 
     .mobile-explorer {

@@ -1,0 +1,93 @@
+@use "../../styles/variables.scss" as *;
+
+.top-header {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) minmax(22rem, 30rem);
+  grid-template-rows: auto auto;
+  align-items: end;
+  column-gap: 2rem;
+  row-gap: 0.6rem;
+  width: 100%;
+  min-height: 7.5rem;
+}
+
+.top-header-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 2.5rem;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: start;
+}
+
+.top-header-menu {
+  min-width: 0;
+  max-width: 100%;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+  justify-self: end;
+  padding-bottom: 0.05rem;
+}
+
+.top-header-search {
+  grid-column: 3;
+  grid-row: 1;
+  width: min(100%, 30rem);
+  justify-self: end;
+  align-self: end;
+
+  & > .search {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+}
+
+.top-header-actions {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media all and ($mobile) {
+  .top-header {
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    row-gap: 0.85rem;
+  }
+
+  .top-header-brand,
+  .top-header-menu,
+  .top-header-search,
+  .top-header-actions {
+    grid-column: 1;
+    justify-self: stretch;
+  }
+
+  .top-header-brand {
+    grid-row: 1;
+  }
+
+  .top-header-menu {
+    grid-row: 2;
+    align-self: stretch;
+    padding-bottom: 0;
+  }
+
+  .top-header-search {
+    grid-row: 3;
+    width: 100%;
+  }
+
+  .top-header-actions {
+    grid-row: 4;
+    justify-content: flex-start;
+  }
+}
