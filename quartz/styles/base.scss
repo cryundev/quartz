@@ -387,6 +387,17 @@ a {
       flex: 0 0 auto;
     }
 
+    @media all and ($mobile) {
+      & .sidebar.right > .explorer {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        padding: 0;
+        overflow: visible;
+      }
+    }
+
     & .center {
       grid-area: grid-center;
       display: flex;
