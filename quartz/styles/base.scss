@@ -748,32 +748,49 @@ p {
 }
 
 .table-container {
+  width: calc(100% - 0.5rem);
+  margin: 1.3rem auto 1.9rem;
+  padding: 0 0.25rem;
+  box-sizing: border-box;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 
   & > table {
-    margin: 1rem;
-    padding: 1.5rem;
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    table-layout: fixed;
     border-collapse: collapse;
 
     th,
     td {
-      min-width: 75px;
+      min-width: 0;
+      width: auto;
+      vertical-align: top;
+      overflow-wrap: break-word;
     }
 
     & > * {
       line-height: 2rem;
     }
   }
+
+  @media all and ($mobile) {
+    width: 100%;
+    padding: 0;
+    margin: 1.15rem 0 1.65rem;
+  }
 }
 
 th {
   text-align: left;
-  padding: 0.4rem 0.7rem;
+  padding: 0.55rem 0.85rem;
   border-bottom: 2px solid var(--gray);
 }
 
 td {
-  padding: 0.2rem 0.7rem;
+  padding: 0.4rem 0.85rem;
 }
 
 tr {
