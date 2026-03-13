@@ -1,38 +1,8 @@
 @use "../../styles/variables.scss" as *;
 
 @media all and ($mobile) {
-  .page > #quartz-body {
-    // Shift page position when toggling Explorer on mobile.
-    & > :not(.sidebar:has(.explorer)) {
-      transition: transform 300ms ease-in-out;
-    }
-
-    &.lock-scroll > :not(.sidebar:has(.explorer)) {
-      transform: translateX(100dvw);
-      transition: transform 300ms ease-in-out;
-    }
-
-    // Sticky top bar (stays in place when scrolling down on mobile).
-    .sidebar.left:has(.explorer) {
-      box-sizing: border-box;
-      position: sticky;
-      background-color: var(--light);
-      padding: 1rem 0 1rem 0;
-      margin: 0;
-    }
-
-    .hide-until-loaded ~ .explorer-content {
-      display: none;
-    }
-
-    .sidebar.right:has(.explorer:not(.collapsed)) {
-      z-index: 240;
-
-      & > :not(.explorer) {
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
+  .explorer .hide-until-loaded ~ .explorer-content {
+    display: none;
   }
 }
 
@@ -57,17 +27,12 @@
   @media all and ($mobile) {
     order: -1;
     height: initial;
-    overflow: visible;
+    overflow: hidden;
     flex-shrink: 0;
     align-self: stretch;
     width: 100%;
-    position: relative;
-    margin-top: auto;
-    margin-bottom: auto;
-
-    &:not(.collapsed) {
-      z-index: 260;
-    }
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   button.mobile-explorer {
@@ -341,100 +306,42 @@ li:has(> .folder-outer:not(.open)) > .folder-container > svg {
 
 .explorer {
   @media all and ($mobile) {
-    &.collapsed {
-      flex: 0 0 34px;
-
-      & > .explorer-content {
-        transform: translateX(-100vw);
-        visibility: hidden;
-      }
-    }
-
-    &:not(.collapsed) {
-      flex: 0 0 34px;
-
-      & > .explorer-content {
-        transform: translateX(0);
-        visibility: visible;
-      }
-    }
-
     .explorer-content {
-      box-sizing: border-box;
-      z-index: 320;
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      margin-top: 0;
-      background-color: var(--light);
+      position: static;
+      inset: auto;
+      display: block;
+      margin-top: 0.9rem;
+      background-color: transparent;
       max-width: none;
-      min-width: 100vw;
-      width: 100vw;
-      transform: translateX(-100%);
-      transition:
-        transform 200ms ease,
-        visibility 200ms ease;
-      overflow: hidden;
-      padding: calc(env(safe-area-inset-top, 0px) + 4.25rem) 0
-        calc(env(safe-area-inset-bottom, 0px) + 2rem) 0;
-      height: 100dvh;
-      max-height: 100dvh;
-      visibility: hidden;
+      min-width: 0;
+      width: 100%;
+      transform: none;
+      transition: none;
+      overflow: visible;
+      padding: 0;
+      height: auto;
+      max-height: none;
+      visibility: visible;
     }
 
     .explorer-content > .explorer-ul {
-      flex: 1 1 auto;
-      min-height: 0;
       max-height: none;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 1rem;
+      overflow: visible;
+      padding-bottom: 0;
     }
 
     .explorer-parent {
-      margin-left: 1rem;
-      margin-right: 1rem;
+      margin-left: 0;
+      margin-right: 0;
     }
 
     .mobile-explorer {
       margin: 0;
-      padding: 5px;
-      z-index: 321;
+      padding: 0;
 
       .lucide-menu {
         stroke: var(--darkgray);
       }
-    }
-
-    &:not(.collapsed) .mobile-explorer {
-      position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 1rem);
-      right: 1rem;
-      width: 2.6rem;
-      height: 2.6rem;
-      padding: 0;
-      justify-content: center;
-      border-radius: 999px;
-      border: 1px solid color-mix(in srgb, var(--lightgray) 70%, var(--secondary) 10%);
-      background: color-mix(in srgb, var(--light) 88%, white);
-      box-shadow: 0 12px 28px rgba(27, 33, 48, 0.12);
-    }
-  }
-}
-
-.mobile-no-scroll {
-  @media all and ($mobile) {
-    overflow: hidden;
-
-    body {
-      overflow: hidden;
-    }
-
-    .explorer-content > .explorer-ul {
-      overscroll-behavior: contain;
     }
   }
 }
