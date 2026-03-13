@@ -3,17 +3,17 @@
 @media all and ($mobile) {
   .page > #quartz-body {
     // Shift page position when toggling Explorer on mobile.
-    & > :not(.sidebar.left:has(.explorer)) {
+    & > :not(.sidebar:has(.explorer)) {
       transition: transform 300ms ease-in-out;
     }
 
-    &.lock-scroll > :not(.sidebar.left:has(.explorer)) {
+    &.lock-scroll > :not(.sidebar:has(.explorer)) {
       transform: translateX(100dvw);
       transition: transform 300ms ease-in-out;
     }
 
     // Sticky top bar (stays in place when scrolling down on mobile).
-    .sidebar.left:has(.explorer) {
+    .sidebar:has(.explorer) {
       box-sizing: border-box;
       position: sticky;
       background-color: var(--light);
@@ -50,7 +50,8 @@
     height: initial;
     overflow: hidden;
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self: stretch;
+    width: 100%;
     margin-top: auto;
     margin-bottom: auto;
   }
