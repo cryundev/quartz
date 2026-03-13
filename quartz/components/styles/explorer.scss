@@ -24,6 +24,15 @@
     .hide-until-loaded ~ .explorer-content {
       display: none;
     }
+
+    .sidebar.right:has(.explorer:not(.collapsed)) {
+      z-index: 240;
+
+      & > :not(.explorer) {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
   }
 }
 
@@ -52,8 +61,13 @@
     flex-shrink: 0;
     align-self: stretch;
     width: 100%;
+    position: relative;
     margin-top: auto;
     margin-bottom: auto;
+
+    &:not(.collapsed) {
+      z-index: 260;
+    }
   }
 
   button.mobile-explorer {
@@ -347,7 +361,7 @@ li:has(> .folder-outer:not(.open)) > .folder-container > svg {
 
     .explorer-content {
       box-sizing: border-box;
-      z-index: 100;
+      z-index: 320;
       position: fixed;
       inset: 0;
       margin-top: 0;
@@ -383,7 +397,7 @@ li:has(> .folder-outer:not(.open)) > .folder-container > svg {
     .mobile-explorer {
       margin: 0;
       padding: 5px;
-      z-index: 101;
+      z-index: 321;
 
       .lucide-menu {
         stroke: var(--darkgray);
