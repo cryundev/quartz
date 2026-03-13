@@ -53,12 +53,14 @@ export default ((opts?: Partial<TagContentOptions>) => {
         tagItemMap.set(tag, allPagesWithTag(tag))
       }
       return (
-        <div class="popover-hint">
+        <div class="popover-hint tag-content-view">
           <article class={classes}>
             <p>{content}</p>
           </article>
-          <p>{i18n(cfg.locale).pages.tagContent.totalTags({ count: tags.length })}</p>
-          <div>
+          <p class="tag-summary">
+            {i18n(cfg.locale).pages.tagContent.totalTags({ count: tags.length })}
+          </p>
+          <div class="tag-sections">
             {tags.map((tag) => {
               const pages = tagItemMap.get(tag)!
               const listProps = {
@@ -78,7 +80,7 @@ export default ((opts?: Partial<TagContentOptions>) => {
               const href = resolveRelative(fileData.slug!, tagListingPage)
 
               return (
-                <div>
+                <section class="tag-section">
                   <h2>
                     <a class="internal tag-link" href={href}>
                       {tag}
@@ -101,7 +103,7 @@ export default ((opts?: Partial<TagContentOptions>) => {
                     </p>
                     <PageList limit={options.numPages} {...listProps} sort={options?.sort} />
                   </div>
-                </div>
+                </section>
               )
             })}
           </div>
@@ -115,7 +117,7 @@ export default ((opts?: Partial<TagContentOptions>) => {
       }
 
       return (
-        <div class="popover-hint">
+        <div class="popover-hint tag-content-view">
           <article class={classes}>{content}</article>
           <div class="page-listing">
             <p>{i18n(cfg.locale).pages.tagContent.itemsUnderTag({ count: pages.length })}</p>

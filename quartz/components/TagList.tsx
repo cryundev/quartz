@@ -29,8 +29,8 @@ TagList.css = `
   list-style: none;
   display: flex;
   padding-left: 0;
-  gap: 0.4rem;
-  margin: 1rem 0;
+  gap: 0.55rem;
+  margin: 1.1rem 0 0;
   flex-wrap: wrap;
 }
 
@@ -46,10 +46,17 @@ TagList.css = `
 }
 
 a.internal.tag-link {
-  border-radius: 8px;
-  background-color: var(--highlight);
-  padding: 0.2rem 0.4rem;
-  margin: 0 0.1rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tertiary) 26%, var(--lightgray));
+  background-color: color-mix(in srgb, var(--tertiary) 10%, var(--light));
+  color: var(--secondary);
+  padding: 0.35rem 0.75rem;
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
 }
 `
 

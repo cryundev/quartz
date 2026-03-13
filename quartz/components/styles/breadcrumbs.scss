@@ -1,19 +1,29 @@
 .breadcrumb-container {
   margin: 0;
-  margin-top: 0.75rem;
+  margin-top: 0;
   padding: 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.3rem 0.55rem;
+  color: var(--gray);
+  font-family: var(--headerFont);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .breadcrumb-element {
+  a {
+    color: inherit;
+  }
+
   p {
     margin: 0;
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
     padding: 0;
     line-height: normal;
+    opacity: 0.5;
   }
   display: flex;
   flex-direction: row;

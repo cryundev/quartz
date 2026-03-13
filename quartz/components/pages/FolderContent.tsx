@@ -36,11 +36,47 @@ export default ((opts?: Partial<FolderContentOptions>) => {
       return null
     }
 
+    const buildFolderCardPreview = (node: (typeof folder)["children"][number]) => {
+      const items = [...node.children]
+        .sort((a, b) => {
+          if (a.isFolder !== b.isFolder) {
+            return a.isFolder ? -1 : 1
+          }
+
+          return a.displayName.localeCompare(b.displayName, undefined, {
+            numeric: true,
+            sensitivity: "base",
+          })
+        })
+        .slice(0, 4)
+        .map((child) => ({
+          title: child.displayName,
+          slug: child.slug,
+          isFolder: child.isFolder,
+        }))
+
+      return {
+        items,
+        remainingCount: Math.max(node.children.length - items.length, 0),
+      }
+    }
+
     const allPagesInFolder: QuartzPluginData[] =
       folder.children
         .map((node) => {
           // regular file, proceed
           if (node.data) {
+            if (node.isFolder) {
+              if (!options.showSubfolders) {
+                return undefined
+              }
+
+              return {
+                ...node.data,
+                folderCardPreview: buildFolderCardPreview(node),
+              }
+            }
+
             return node.data
           }
 
@@ -84,6 +120,7 @@ export default ((opts?: Partial<FolderContentOptions>) => {
                 title: node.displayName,
                 tags: [],
               },
+              folderCardPreview: buildFolderCardPreview(node),
             }
           }
         })
@@ -103,7 +140,7 @@ export default ((opts?: Partial<FolderContentOptions>) => {
     ) as ComponentChildren
 
     return (
-      <div class="popover-hint">
+      <div class="popover-hint folder-content-view">
         <article class={classes}>{content}</article>
         <div class="page-listing">
           {options.showFolderCount && (

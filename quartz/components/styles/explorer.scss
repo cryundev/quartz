@@ -30,17 +30,13 @@
 .explorer {
   display: flex;
   flex-direction: column;
-  overflow-y: hidden;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
 
-  min-height: 1.2rem;
-  flex: 0 1 auto;
-
-  &.collapsed {
-    flex: 0 1 1.2rem;
-
-    & .fold {
-      transform: rotateZ(-90deg);
-    }
+  &.collapsed .fold {
+    transform: rotateZ(-90deg);
   }
 
   & .fold {
@@ -103,6 +99,8 @@ button.desktop-explorer {
   color: var(--dark);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
 
   & h2 {
     font-size: 1rem;
@@ -113,9 +111,8 @@ button.desktop-explorer {
 
 .explorer-content {
   list-style: none;
-  overflow: hidden;
-  overflow-y: auto;
-  margin-top: 0.5rem;
+  overflow: visible;
+  margin-top: 0.9rem;
 
   & ul {
     list-style: none;
@@ -124,16 +121,37 @@ button.desktop-explorer {
 
     &.explorer-ul {
       overscroll-behavior: contain;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
     }
 
     & li > a {
       color: var(--dark);
-      opacity: 0.75;
+      opacity: 0.88;
       pointer-events: all;
+      display: block;
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border-radius: 0.95rem;
+      background: color-mix(in srgb, var(--light) 62%, white);
+      border: 1px solid color-mix(in srgb, var(--lightgray) 70%, var(--secondary) 8%);
+      box-sizing: border-box;
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
 
       &.active {
         opacity: 1;
-        color: var(--tertiary);
+        color: var(--secondary);
+        border-color: color-mix(in srgb, var(--secondary) 30%, var(--lightgray));
+        background: color-mix(in srgb, var(--secondary) 8%, white);
+      }
+
+      &:hover {
+        color: var(--secondary);
+        border-color: color-mix(in srgb, var(--secondary) 20%, var(--lightgray));
       }
     }
   }
@@ -160,18 +178,24 @@ button.desktop-explorer {
   }
 }
 
+.explorer.collapsed .explorer-content {
+  display: none;
+}
+
 .explorer-parent-item {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.1rem;
 }
 
 .explorer-content .folder-link,
 .explorer-content .explorer-parent {
   position: relative;
-  display: inline-block;
-  padding-left: 1.15rem;
+  display: block;
+  width: 100%;
+  padding-left: 1.75rem;
   font-family: var(--headerFont);
   font-weight: $semiBoldWeight;
   color: var(--secondary);
+  box-sizing: border-box;
 }
 
 .explorer-content .folder-link:hover,
@@ -183,12 +207,13 @@ button.desktop-explorer {
 .explorer-content .explorer-parent::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0.55rem;
+  left: 0.8rem;
+  top: 50%;
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 2px;
   background: color-mix(in srgb, var(--secondary) 75%, var(--light));
+  transform: translateY(-50%);
 }
 
 .explorer-content .explorer-parent.is-disabled {
@@ -259,6 +284,44 @@ li:has(> .folder-outer:not(.open)) > .folder-container > svg {
 
 .folder-icon:hover {
   color: var(--tertiary);
+}
+
+:root[saved-theme="dark"] {
+  .explorer-content ul li > a {
+    background: color-mix(in srgb, var(--page-surface) 84%, #36383a);
+    border-color: color-mix(in srgb, var(--page-border) 88%, transparent);
+  }
+
+  .explorer-content ul li > a.active {
+    color: var(--dark);
+    border-color: color-mix(in srgb, var(--page-border) 72%, var(--secondary) 10%);
+    background: color-mix(in srgb, var(--highlight) 18%, var(--page-surface) 82%);
+  }
+
+  .explorer-content ul li > a:hover {
+    color: var(--dark);
+    border-color: color-mix(in srgb, var(--page-border) 74%, var(--secondary) 10%);
+  }
+
+  .explorer-content .folder-link,
+  .explorer-content .explorer-parent,
+  .folder-container div > a,
+  .folder-container div > button span,
+  .folder-icon {
+    color: color-mix(in srgb, var(--darkgray) 90%, var(--secondary) 10%);
+  }
+
+  .explorer-content .folder-link:hover,
+  .explorer-content .explorer-parent:hover,
+  .folder-container div > a:hover,
+  .folder-icon:hover {
+    color: var(--dark);
+  }
+
+  .explorer-content .folder-link::before,
+  .explorer-content .explorer-parent::before {
+    background: color-mix(in srgb, var(--darkgray) 66%, var(--page-surface) 34%);
+  }
 }
 
 .explorer {

@@ -23,23 +23,29 @@ interface RenderComponents {
 }
 
 const headerRegex = new RegExp(/h[1-6]/)
+const assetVersion = process.env.QUARTZ_ASSET_VERSION ?? `${Math.floor(Date.now() / 1000)}`
+
+function withAssetVersion(path: string): string {
+  return `${path}?v=${assetVersion}`
+}
+
 export function pageResources(
   baseDir: FullSlug | RelativeURL,
   staticResources: StaticResources,
 ): StaticResources {
-  const contentIndexPath = joinSegments(baseDir, "static/contentIndex.json")
+  const contentIndexPath = withAssetVersion(joinSegments(baseDir, "static/contentIndex.json"))
   const contentIndexScript = `const fetchData = fetch("${contentIndexPath}").then(data => data.json())`
 
   const resources: StaticResources = {
     css: [
       {
-        content: joinSegments(baseDir, "index.css"),
+        content: withAssetVersion(joinSegments(baseDir, "index.css")),
       },
       ...staticResources.css,
     ],
     js: [
       {
-        src: joinSegments(baseDir, "prescript.js"),
+        src: withAssetVersion(joinSegments(baseDir, "prescript.js")),
         loadTime: "beforeDOMReady",
         contentType: "external",
       },
@@ -55,7 +61,7 @@ export function pageResources(
   }
 
   resources.js.push({
-    src: joinSegments(baseDir, "postscript.js"),
+    src: withAssetVersion(joinSegments(baseDir, "postscript.js")),
     loadTime: "afterDOMReady",
     moduleType: "module",
     contentType: "external",
@@ -274,12 +280,14 @@ export function renderPage(
           <Body {...componentData}>
             {LeftComponent}
             <div class="center">
-              <div class="popover-hint">
-                {beforeBody.map((BodyComponent) => (
-                  <BodyComponent {...componentData} />
-                ))}
+              <div class="center-content">
+                <div class="page-lede popover-hint">
+                  {beforeBody.map((BodyComponent) => (
+                    <BodyComponent {...componentData} />
+                  ))}
+                </div>
+                <Content {...componentData} />
               </div>
-              <Content {...componentData} />
               <hr />
               <div class="page-footer">
                 {afterBody.map((BodyComponent) => (

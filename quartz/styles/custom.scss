@@ -1,101 +1,84 @@
 @use "./base.scss";
 
 // put your custom CSS here!
-body
-{
-    line-height: 2 !important;
+body {
+  line-height: 2 !important;
 }
 
-img[alt*="center"]
-{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+img[alt*="center"] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-img[alt*="right"]
-{
-    float: right;
-    clear: right;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+img[alt*="right"] {
+  float: right;
+  clear: right;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 // Explorer file links font size
 .explorer-content ul li > a {
-    font-size: 0.85rem !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
+  font-size: 0.85rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
 }
 
 // Explorer folder titles - prevent wrapping
 .folder-container div > button span {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-}
-
-// Folder page list font size
-.section-ul .section-li .section .desc h3 {
-    font-size: 0.85rem !important;
-}
-
-.section-ul .section-li .section .meta {
-    font-size: 0.85rem !important;
-}
-
-// Hide tags in folder page list
-.section-ul .section-li .section .tags {
-    display: none !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
 }
 
 // Increase page max-width
 .page {
-    max-width: 1900px !important;
+  max-width: 1900px !important;
 }
 
 // Heading colors for light mode
 article h2 {
-    color: #D97706 !important;
+  color: #d97706 !important;
 }
 
 article h3 {
-    color: #C2410C !important;
+  color: #c2410c !important;
 }
 
 article h4 {
-    color: #2563EB !important;
+  color: #2563eb !important;
 }
 
 article h5 {
-    color: #1E40AF !important;
+  color: #1e40af !important;
 }
 
 article h6 {
-    color: #7C3AED !important;
+  color: #7c3aed !important;
 }
 
 // Heading colors for dark mode
-[saved-theme="dark"] article h2 {
-    color: #FF9F4A !important;
+:root[saved-theme="dark"] article h2 {
+  color: #d2aa78 !important;
 }
 
-[saved-theme="dark"] article h3 {
-    color: #FF8111 !important;
+:root[saved-theme="dark"] article h3 {
+  color: #c98f6e !important;
 }
 
-[saved-theme="dark"] article h4 {
-    color: #9FBDFF !important;
+:root[saved-theme="dark"] article h4 {
+  color: #92accc !important;
 }
 
-[saved-theme="dark"] article h5 {
-    color: #79A4FF !important;
+:root[saved-theme="dark"] article h5 {
+  color: #879dbe !important;
 }
 
-[saved-theme="dark"] article h6 {
-    color: #D8AAFF !important;
+:root[saved-theme="dark"] article h6 {
+  color: #af9dbf !important;
 }

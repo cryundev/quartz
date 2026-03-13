@@ -8,8 +8,8 @@ Header.css = `
 header {
   width: 100%;
   margin: 0;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--lightgray);
+  padding: 0;
+  border: none;
 }
 `
 

@@ -18,9 +18,28 @@ html {
 body {
   margin: 0;
   box-sizing: border-box;
-  background-color: var(--light);
+  background:
+    radial-gradient(circle at top right, rgba(132, 165, 157, 0.16), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--light) 84%, white) 0%, var(--light) 100%);
   font-family: var(--bodyFont);
   color: var(--darkgray);
+}
+
+:root[saved-theme="dark"] body {
+  background:
+    radial-gradient(circle at top right, rgba(141, 162, 172, 0.1), transparent 30%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--light) 98%, #1b1c1e) 0%,
+      color-mix(in srgb, var(--light) 94%, #141516) 100%
+    );
+}
+
+:root[saved-theme="dark"] .page {
+  --page-surface: color-mix(in srgb, var(--light) 97%, #2b2d2f);
+  --page-surface-muted: color-mix(in srgb, var(--light) 94%, #313335);
+  --page-border: color-mix(in srgb, var(--lightgray) 82%, var(--secondary) 10%);
+  --page-shadow: 0 22px 48px rgba(0, 0, 0, 0.22), 0 10px 22px rgba(0, 0, 0, 0.16);
 }
 
 .text-highlight {
@@ -160,9 +179,24 @@ a {
 }
 
 .page {
-  max-width: calc(#{map.get($breakpoints, desktop)} + 300px);
-  margin: 0 auto;
+  --layout-gap: 1.35rem;
+  --page-surface: color-mix(in srgb, var(--light) 88%, white);
+  --page-surface-muted: color-mix(in srgb, var(--light) 76%, white);
+  --page-border: color-mix(in srgb, var(--lightgray) 70%, var(--secondary) 10%);
+  --page-shadow: 0 28px 60px rgba(27, 33, 48, 0.08), 0 10px 20px rgba(27, 33, 48, 0.05);
+  width: min(1460px, calc(100% - 2rem));
+  max-width: 1460px;
+  margin: 0 auto 3rem;
+
+  @media all and ($mobile) {
+    width: calc(100% - 1rem);
+    margin-bottom: 2rem;
+  }
+
   & article {
+    font-size: 1.02rem;
+    line-height: 1.9;
+
     & > h1 {
       font-size: 2rem;
     }
@@ -186,6 +220,21 @@ a {
     p > strong {
       color: var(--dark);
     }
+
+    p,
+    ul,
+    ol,
+    li {
+      line-height: 1.9;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 2rem auto;
+      border-radius: 1.15rem;
+      box-shadow: 0 20px 45px rgba(27, 33, 48, 0.12);
+    }
   }
 
   & > #quartz-body {
@@ -195,6 +244,8 @@ a {
     column-gap: #{map.get($desktopGrid, columnGap)};
     row-gap: #{map.get($desktopGrid, rowGap)};
     grid-template-areas: #{map.get($desktopGrid, templateAreas)};
+    column-gap: clamp(1.5rem, 2vw, 2.5rem);
+    row-gap: var(--layout-gap);
 
     @media all and ($tablet) {
       grid-template-columns: #{map.get($tabletGrid, templateColumns)};
@@ -202,36 +253,80 @@ a {
       column-gap: #{map.get($tabletGrid, columnGap)};
       row-gap: #{map.get($tabletGrid, rowGap)};
       grid-template-areas: #{map.get($tabletGrid, templateAreas)};
+      column-gap: 1.5rem;
+      row-gap: var(--layout-gap);
     }
+
     @media all and ($mobile) {
       grid-template-columns: #{map.get($mobileGrid, templateColumns)};
       grid-template-rows: #{map.get($mobileGrid, templateRows)};
       column-gap: #{map.get($mobileGrid, columnGap)};
       row-gap: #{map.get($mobileGrid, rowGap)};
       grid-template-areas: #{map.get($mobileGrid, templateAreas)};
+      row-gap: 1rem;
+    }
+
+    &:has(> .sidebar.left:empty) > .sidebar.left,
+    &:has(> .sidebar.right:empty) > .sidebar.right {
+      display: none;
+    }
+
+    @media all and not ($mobile) {
+      &:has(> .sidebar.left:empty):has(> .sidebar.right:not(:empty)) {
+        grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "grid-center grid-sidebar-right"
+          "grid-footer grid-sidebar-right";
+
+        @media all and ($tablet) {
+          grid-template-columns: minmax(0, 1fr) minmax(16rem, 18.5rem);
+        }
+      }
+
+      &:has(> .sidebar.right:empty):has(> .sidebar.left:not(:empty)) {
+        grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "grid-sidebar-left grid-center"
+          "grid-sidebar-left grid-footer";
+      }
+
+      &:has(> .sidebar.left:empty):has(> .sidebar.right:empty) {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "grid-center"
+          "grid-footer";
+      }
     }
 
     @media all and not ($desktop) {
-      padding: 0 1rem;
+      padding: 0;
     }
+
     @media all and ($mobile) {
       margin: 0 auto;
     }
 
     & .sidebar {
-      gap: 1.2rem;
-      top: 0;
+      gap: 1rem;
+      top: 1.4rem;
       box-sizing: border-box;
-      padding: 2rem 2rem 2rem 2rem;
+      padding: 0;
       display: flex;
-      height: 100vh;
+      height: fit-content;
+      max-height: calc(100vh - 2.5rem);
       position: sticky;
+      align-self: start;
+      align-items: stretch;
     }
 
     & .sidebar.left {
       z-index: 1;
       grid-area: grid-sidebar-left;
       flex-direction: column;
+
       @media all and ($mobile) {
         gap: 0;
         align-items: center;
@@ -240,7 +335,7 @@ a {
         height: unset;
         flex-direction: row;
         padding: 0;
-        padding-top: 1rem;
+        padding-top: 0.25rem;
       }
     }
 
@@ -248,28 +343,54 @@ a {
       grid-area: grid-sidebar-right;
       margin-right: 0;
       flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 0.2rem;
+
       @media all and ($mobile) {
         margin-left: inherit;
         margin-right: inherit;
+        overflow: visible;
+        padding-right: 0;
       }
-      @media all and not ($desktop) {
+
+      @media all and ($mobile) {
         position: initial;
         height: unset;
         width: 100%;
         flex-direction: row;
         padding: 0;
+
         & > * {
           flex: 1;
           max-height: 24rem;
         }
+
         & > .toc {
           display: none;
         }
       }
     }
 
+    & .sidebar.left > *,
+    & .sidebar.right > * {
+      background: var(--page-surface-muted);
+      border: 1px solid var(--page-border);
+      border-radius: 1.3rem;
+      padding: 1.1rem 1.15rem;
+      box-shadow: 0 14px 32px rgba(27, 33, 48, 0.06);
+      backdrop-filter: blur(10px);
+      width: 100%;
+      box-sizing: border-box;
+      flex: 0 0 auto;
+    }
+
     & .center {
       grid-area: grid-center;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
     }
 
     & footer {
@@ -279,37 +400,121 @@ a {
     & .center,
     & footer {
       max-width: 100%;
-      min-width: 100%;
+      min-width: 0;
       margin-left: auto;
       margin-right: auto;
+
       @media all and ($tablet) {
         margin-right: 0;
       }
+
       @media all and ($mobile) {
         margin-right: 0;
         margin-left: 0;
       }
     }
 
-    & .center > .popover-hint {
-      margin-top: 1rem;
+    & .center-content,
+    & .page-footer,
+    & hr,
+    & footer {
+      width: 100%;
+      max-width: none;
+    }
+
+    & .center-content {
+      background: var(--page-surface);
+      border: 1px solid var(--page-border);
+      border-radius: 1.7rem;
+      box-shadow: var(--page-shadow);
+      overflow: hidden;
+      justify-self: stretch;
+    }
+
+    & .center-content > .page-lede {
+      margin-top: 0;
+      padding: 2.35rem 2.7rem 1.5rem;
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--page-surface-muted) 82%, white) 0%,
+        var(--page-surface) 100%
+      );
+      border-bottom: 1px solid color-mix(in srgb, var(--page-border) 88%, transparent);
+    }
+
+    & .center-content > .page-lede:empty {
+      display: none;
+    }
+
+    & .center-content > .page-lede > * {
+      max-width: 58rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    & .center-content > :not(.page-lede).popover-hint {
+      margin-top: 0;
+      padding: 1.95rem 2.7rem 3.35rem;
+      width: 100%;
+      box-sizing: border-box;
+
+      > * {
+        max-width: 58rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      > :first-child {
+        margin-top: 0;
+      }
+    }
+
+    & .center-content:has(> .page-lede:empty) > :not(.page-lede).popover-hint {
+      padding-top: 2.6rem;
+    }
+
+    :root[saved-theme="dark"] & .center-content > .page-lede {
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--page-surface-muted) 96%, #353739) 0%,
+        color-mix(in srgb, var(--page-surface) 98%, #2d2f31) 100%
+      );
     }
 
     & .page-footer {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
+      align-self: stretch;
+    }
+
+    & hr {
+      border: none;
+      border-top: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+      margin: 0.75rem auto 0;
+      align-self: stretch;
     }
 
     & footer {
       margin-left: 0;
+      align-self: stretch;
+    }
+
+    @media all and ($mobile) {
+      & .center-content > .page-lede {
+        padding: 1.65rem 1.2rem 1.1rem;
+      }
+
+      & .center-content > :not(.page-lede).popover-hint {
+        padding: 1.5rem 1.2rem 2.35rem;
+      }
     }
   }
 
   & > .page-header {
     width: 100%;
-    margin: 2rem 0 0 0;
+    margin: 1.5rem 0 var(--layout-gap) 0;
 
     @media all and not ($desktop) {
-      padding: 0 1rem;
+      padding: 0;
       box-sizing: border-box;
     }
 
@@ -357,9 +562,11 @@ input[type="checkbox"] {
 }
 
 blockquote {
-  margin: 1rem 0;
-  border-left: 3px solid var(--secondary);
-  padding-left: 1rem;
+  margin: 1.4rem 0;
+  border-left: 4px solid color-mix(in srgb, var(--secondary) 72%, var(--tertiary));
+  padding: 0.9rem 0 0.9rem 1.2rem;
+  border-radius: 0 1rem 1rem 0;
+  background: color-mix(in srgb, var(--highlight) 88%, white);
   transition: border-color 0.2s ease;
 }
 
@@ -408,7 +615,7 @@ h6 {
 // typography improvements
 h1 {
   font-size: 1.75rem;
-  margin-top: 2.25rem;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
 
@@ -457,9 +664,9 @@ figure[data-rehype-pretty-code-figure] {
 pre {
   font-family: var(--codeFont);
   padding: 0 0.5rem;
-  border-radius: 5px;
+  border-radius: 1rem;
   overflow-x: auto;
-  border: 1px solid var(--lightgray);
+  border: 1px solid color-mix(in srgb, var(--lightgray) 82%, var(--secondary) 8%);
   position: relative;
 
   &:has(> code.mermaid) {
@@ -565,7 +772,7 @@ tr {
 
 img {
   max-width: 100%;
-  border-radius: 5px;
+  border-radius: 1rem;
   margin: 1rem 0;
   content-visibility: auto;
 }
@@ -580,7 +787,7 @@ hr {
   margin: 2rem auto;
   height: 1px;
   border: none;
-  background-color: var(--lightgray);
+  background-color: color-mix(in srgb, var(--lightgray) 82%, transparent);
 }
 
 audio,
@@ -596,6 +803,11 @@ video {
 div:has(> .overflow) {
   max-height: 100%;
   overflow-y: hidden;
+}
+
+.page > #quartz-body .sidebar div:has(> .overflow) {
+  max-height: none;
+  overflow: visible;
 }
 
 ul.overflow,
@@ -617,6 +829,12 @@ ol.overflow {
   &.gradient-active {
     mask-image: linear-gradient(to bottom, black calc(100% - 50px), transparent 100%);
   }
+}
+
+.page > #quartz-body .sidebar ul.overflow,
+.page > #quartz-body .sidebar ol.overflow {
+  max-height: none;
+  overflow: visible;
 }
 
 .transclude {

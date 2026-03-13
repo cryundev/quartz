@@ -1,24 +1,44 @@
 @use "../../styles/variables.scss" as *;
 
 .backlinks {
+  width: 100%;
+  box-sizing: border-box;
   flex-direction: column;
 
   & > h3 {
-    font-size: 1rem;
+    font-size: 0.92rem;
     margin: 0;
   }
 
   & > ul.overflow {
     list-style: none;
     padding: 0;
-    margin: 0.5rem 0;
-    max-height: calc(100% - 2rem);
-    overscroll-behavior: contain;
+    margin: 0.8rem 0 0;
+    max-height: none;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 
     & > li {
       & > a {
-        background-color: transparent;
+        color: color-mix(in srgb, var(--darkgray) 88%, var(--secondary) 12%);
+        display: block;
+        padding: 0.65rem 0.8rem;
+        border-radius: 0.9rem;
+        border: 1px solid color-mix(in srgb, var(--lightgray) 68%, var(--secondary) 8%);
+        background-color: color-mix(in srgb, var(--light) 64%, white);
+        box-sizing: border-box;
+
+        &:hover {
+          color: var(--dark);
+        }
       }
     }
   }
+}
+
+:root[saved-theme="dark"] .backlinks > ul.overflow > li > a {
+  color: color-mix(in srgb, var(--darkgray) 90%, var(--secondary) 10%);
+  background: color-mix(in srgb, var(--page-surface) 84%, #36383a);
 }

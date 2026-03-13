@@ -1,14 +1,11 @@
 @use "../../styles/variables.scss" as *;
 
 .toc {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow-y: hidden;
-  min-height: 1.4rem;
-  flex: 0 0.5 auto;
-  &:has(button.toc-header.collapsed) {
-    flex: 0 1 1.4rem;
-  }
+  overflow: hidden;
 }
 
 button.toc-header {
@@ -20,9 +17,11 @@ button.toc-header {
   color: var(--dark);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
 
   & h3 {
-    font-size: 1rem;
+    font-size: 0.92rem;
     display: inline-block;
     margin: 0;
   }
@@ -41,20 +40,31 @@ button.toc-header {
 ul.toc-content.overflow {
   list-style: none;
   position: relative;
-  margin: 0.5rem 0;
+  margin: 0.8rem 0 0;
   padding: 0;
-  max-height: calc(100% - 2rem);
-  overscroll-behavior: contain;
+  max-height: none;
+  overflow: visible;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 
   & > li > a {
     color: var(--dark);
-    opacity: 0.35;
+    opacity: 0.56;
+    display: block;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--light) 66%, white);
+    box-sizing: border-box;
     transition:
       0.5s ease opacity,
-      0.3s ease color;
+      0.3s ease color,
+      0.2s ease background-color;
     &.in-view {
-      opacity: 0.75;
+      opacity: 1;
+      color: var(--secondary);
+      background: color-mix(in srgb, var(--secondary) 8%, white);
     }
   }
 
@@ -62,5 +72,21 @@ ul.toc-content.overflow {
     & .depth-#{$i} {
       padding-left: calc(1rem * #{$i});
     }
+  }
+}
+
+ul.toc-content.collapsed {
+  display: none;
+}
+
+:root[saved-theme="dark"] {
+  ul.toc-content.overflow > li > a {
+    color: color-mix(in srgb, var(--darkgray) 90%, var(--secondary) 10%);
+    background: color-mix(in srgb, var(--page-surface) 84%, #36383a);
+  }
+
+  ul.toc-content.overflow > li > a.in-view {
+    color: var(--dark);
+    background: color-mix(in srgb, var(--highlight) 24%, var(--page-surface) 76%);
   }
 }

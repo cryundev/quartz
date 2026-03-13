@@ -1,6 +1,12 @@
 .content-meta {
   margin-top: 0;
-  color: var(--darkgray);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 1rem;
+  color: color-mix(in srgb, var(--darkgray) 82%, var(--gray));
+  font-size: 0.92rem;
+  line-height: 1.5;
 
   &[show-comma="true"] {
     > *:not(:last-child) {
@@ -9,6 +15,22 @@
       &::after {
         content: ",";
       }
+    }
+  }
+
+  &[show-comma="false"] {
+    > * {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    > *:not(:last-child)::after {
+      content: "";
+      width: 0.26rem;
+      height: 0.26rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--gray) 78%, transparent);
+      margin-left: 0.8rem;
     }
   }
 }

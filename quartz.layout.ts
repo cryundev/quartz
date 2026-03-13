@@ -22,20 +22,25 @@ export const defaultContentPageLayout: PageLayout = {
       condition: (page) => page.fileData.slug !== "index",
     }),
     Component.ArticleTitle(),
-    Component.ContentMeta(),
+    Component.ContentMeta({ showComma: false }),
     Component.TagList(),
   ],
-  left: [Component.Explorer()],
+  left: [],
   right: [
-    Component.Graph(),
     Component.DesktopOnly(Component.TableOfContents()),
+    Component.Explorer(),
     Component.Backlinks(),
+    Component.DesktopOnly(Component.Graph()),
   ],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)
 export const defaultListPageLayout: PageLayout = {
-  beforeBody: [Component.Breadcrumbs(), Component.ArticleTitle(), Component.ContentMeta()],
-  left: [Component.Explorer()],
-  right: [],
+  beforeBody: [
+    Component.Breadcrumbs(),
+    Component.ArticleTitle(),
+    Component.ContentMeta({ showComma: false }),
+  ],
+  left: [],
+  right: [Component.Explorer()],
 }
