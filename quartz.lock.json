@@ -67,6 +67,12 @@
       "commit": "dd6e94b5ca1cb195104a2b5e624a43ee6aa0a324",
       "installedAt": "2026-07-08T02:22:12.933Z"
     },
+    "content-page": {
+      "source": "github:quartz-community/content-page",
+      "resolved": "https://github.com/quartz-community/content-page.git",
+      "commit": "d22fae357ae74a3e97a2f450862f23f5227842c4",
+      "installedAt": "2026-07-08T05:48:09.088Z"
+    },
     "crawl-links": {
       "source": "github:quartz-community/crawl-links",
       "resolved": "https://github.com/quartz-community/crawl-links.git",
@@ -78,36 +84,6 @@
       "resolved": "https://github.com/quartz-community/created-modified-date.git",
       "commit": "c003199fb842969d43ee9e0f54120a85e588260e",
       "installedAt": "2026-07-08T02:22:06.341Z"
-    },
-    "cryun-content-page": {
-      "source": "./quartz/custom/cryun-content-page",
-      "resolved": "./quartz/custom/cryun-content-page",
-      "commit": "local",
-      "installedAt": "2026-07-08T02:33:54.148Z"
-    },
-    "cryun-explorer": {
-      "source": "./quartz/custom/cryun-explorer",
-      "resolved": "./quartz/custom/cryun-explorer",
-      "commit": "local",
-      "installedAt": "2026-07-08T02:33:54.151Z"
-    },
-    "cryun-frame": {
-      "source": "./quartz/custom/cryun-frame",
-      "resolved": "./quartz/custom/cryun-frame",
-      "commit": "local",
-      "installedAt": "2026-07-08T04:50:48.039Z"
-    },
-    "cryun-folder-page": {
-      "source": "./quartz/custom/cryun-folder-page",
-      "resolved": "./quartz/custom/cryun-folder-page",
-      "commit": "local",
-      "installedAt": "2026-07-08T02:33:54.150Z"
-    },
-    "cryun-tag-page": {
-      "source": "./quartz/custom/cryun-tag-page",
-      "resolved": "./quartz/custom/cryun-tag-page",
-      "commit": "local",
-      "installedAt": "2026-07-08T02:33:54.150Z"
     },
     "darkmode": {
       "source": "github:quartz-community/darkmode",
@@ -133,11 +109,23 @@
       "commit": "4afb630a1cc9034267beb93c928e81d0fa2f4d4b",
       "installedAt": "2026-07-08T02:22:09.710Z"
     },
+    "explorer": {
+      "source": "github:quartz-community/explorer",
+      "resolved": "https://github.com/quartz-community/explorer.git",
+      "commit": "a2dfd1373abe58ace461ebea0b4e94cb287f894e",
+      "installedAt": "2026-07-08T05:48:09.141Z"
+    },
     "favicon": {
       "source": "github:quartz-community/favicon",
       "resolved": "https://github.com/quartz-community/favicon.git",
       "commit": "85842d5c15f937a3d1a02c45accee27118146d73",
       "installedAt": "2026-07-08T02:22:10.244Z"
+    },
+    "folder-page": {
+      "source": "github:quartz-community/folder-page",
+      "resolved": "https://github.com/quartz-community/folder-page.git",
+      "commit": "93304d22e1d7f09f93a33658ec273f7cb8d17793",
+      "installedAt": "2026-07-08T05:48:09.109Z"
     },
     "fonts": {
       "source": "github:quartz-community/fonts",
@@ -264,6 +252,12 @@
       "resolved": "https://github.com/quartz-community/tag-list.git",
       "commit": "c48324e2ba768e2a0a5c4c17cd0661b190d075c5",
       "installedAt": "2026-07-08T02:22:13.282Z"
+    },
+    "tag-page": {
+      "source": "github:quartz-community/tag-page",
+      "resolved": "https://github.com/quartz-community/tag-page.git",
+      "commit": "eabf3eec55c0bab7f49e69957341f34d2ae3c5a1",
+      "installedAt": "2026-07-08T05:48:09.129Z"
     },
     "unlisted-pages": {
       "source": "github:quartz-community/unlisted-pages",

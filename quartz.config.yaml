@@ -16,13 +16,9 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Nanum Gothic
-      body: Noto Sans KR
-      code:
-        name: Roboto Mono
-        weights:
-          - 400
-          - 700
+      header: Schibsted Grotesk
+      body: Source Sans Pro
+      code: IBM Plex Mono
     colors:
       lightMode:
         light: "#faf8f8"
@@ -35,15 +31,15 @@ configuration:
         highlight: rgba(143, 159, 169, 0.15)
         textHighlight: "#fff23688"
       darkMode:
-        light: "#242628"
-        lightgray: "#43474b"
-        gray: "#8c9298"
-        darkgray: "#d6d2ca"
-        dark: "#ece7df"
-        secondary: "#93a3ad"
-        tertiary: "#8ea79f"
-        highlight: rgba(148, 160, 168, 0.16)
-        textHighlight: "#b39a3950"
+        light: "#161618"
+        lightgray: "#393639"
+        gray: "#646464"
+        darkgray: "#d4d4d4"
+        dark: "#ebebec"
+        secondary: "#7b97aa"
+        tertiary: "#84a59d"
+        highlight: rgba(143, 159, 169, 0.15)
+        textHighlight: "#b3aa0288"
 plugins:
   - source: github:quartz-community/created-modified-date
     enabled: true
@@ -77,7 +73,6 @@ plugins:
     layout:
       position: right
       priority: 30
-      display: desktop-only
   - source: github:quartz-community/crawl-links
     enabled: true
     options:
@@ -124,32 +119,35 @@ plugins:
     enabled: true
   - source: github:quartz-community/canvas-page
     enabled: true
-  - source: ./quartz/custom/cryun-frame
+  - source: github:quartz-community/content-page
     enabled: true
-  - source: ./quartz/custom/cryun-content-page
+  - source: github:quartz-community/folder-page
     enabled: true
-  - source: ./quartz/custom/cryun-folder-page
+  - source: github:quartz-community/tag-page
     enabled: true
-  - source: ./quartz/custom/cryun-tag-page
-    enabled: true
-  - source: ./quartz/custom/cryun-explorer
+  - source: github:quartz-community/explorer
     enabled: true
     layout:
-      position: right
-      priority: 20
+      position: left
+      priority: 50
   - source: github:quartz-community/graph
     enabled: true
     layout:
       position: right
-      priority: 50
-      display: desktop-only
+      priority: 10
   - source: github:quartz-community/search
     enabled: true
+    layout:
+      position: left
+      priority: 20
+      group: toolbar
+      groupOptions:
+        grow: true
   - source: github:quartz-community/backlinks
     enabled: true
     layout:
       position: right
-      priority: 40
+      priority: 50
   - source: github:quartz-community/article-title
     enabled: true
     layout:
@@ -157,22 +155,31 @@ plugins:
       priority: 10
   - source: github:quartz-community/content-meta
     enabled: true
-    options:
-      showComma: false
     layout:
       position: beforeBody
       priority: 20
   - source: github:quartz-community/tag-list
-    enabled: true
+    enabled: false
     layout:
       position: beforeBody
       priority: 30
   - source: github:quartz-community/page-title
-    enabled: false
+    enabled: true
+    layout:
+      position: left
+      priority: 10
   - source: github:quartz-community/darkmode
     enabled: true
+    layout:
+      position: left
+      priority: 30
+      group: toolbar
   - source: github:quartz-community/reader-mode
     enabled: true
+    layout:
+      position: left
+      priority: 35
+      group: toolbar
   - source: github:quartz-community/breadcrumbs
     enabled: true
     layout:
@@ -196,13 +203,19 @@ plugins:
   - source: github:quartz-community/recent-notes
     enabled: false
   - source: github:quartz-community/spacer
-    enabled: false
+    enabled: true
+    options: {}
+    order: 25
+    layout:
+      position: left
+      priority: 25
+      display: mobile-only
   - source: github:quartz-community/bases-page
     enabled: true
     options: {}
     order: 50
   - source: github:quartz-community/note-properties
-    enabled: false
+    enabled: true
     options:
       includeAll: false
       includedProperties:
@@ -241,12 +254,27 @@ plugins:
       priority: 50
       display: all
 layout:
+  groups:
+    toolbar:
+      priority: 35
+      direction: row
+      gap: 0.5rem
   byPageType:
-    content:
-      template: cryun
-    folder:
-      template: cryun
-    tag:
-      template: cryun
     "404":
-      template: cryun
+      positions:
+        beforeBody: []
+        left: []
+        right: []
+    content: {}
+    folder:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    tag:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    canvas: {}
+    bases: {}
