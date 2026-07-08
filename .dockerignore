@@ -1,0 +1,10 @@
+.git
+.claude
+.idea
+.quartz
+node_modules
+public
+public-preview
+public-live-preview
+prof
+tsconfig.tsbuildinfo
