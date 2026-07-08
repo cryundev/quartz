@@ -2,6 +2,7 @@
 .gitignore
 node_modules
 public
+public-preview
 prof
 tsconfig.tsbuildinfo
 .obsidian

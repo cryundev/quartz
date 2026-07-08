@@ -1,0 +1,29 @@
+{
+  "name": "cryun-explorer",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node ../build-plugin.mjs"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./components": "./dist/components/index.js"
+  },
+  "quartz": {
+    "name": "cryun-explorer",
+    "displayName": "Cryun Explorer",
+    "description": "Contextual folder explorer for Cryun's WIKI.",
+    "version": "1.0.0",
+    "category": [
+      "component"
+    ],
+    "components": {
+      "CryunExplorer": {
+        "name": "CryunExplorer",
+        "displayName": "Cryun Explorer",
+        "description": "Shows the current folder level with an up-one-level link.",
+        "version": "1.0.0"
+      }
+    }
+  }
+}
