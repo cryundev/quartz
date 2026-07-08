@@ -124,6 +124,8 @@ plugins:
     enabled: true
   - source: github:quartz-community/canvas-page
     enabled: true
+  - source: ./quartz/custom/cryun-frame
+    enabled: true
   - source: ./quartz/custom/cryun-content-page
     enabled: true
   - source: ./quartz/custom/cryun-folder-page

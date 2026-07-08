@@ -1,5 +1,6 @@
-import { PageFrame, PageFrameProps } from "../../components/frames/types"
-import TopHeaderConstructor from "../components/TopHeader"
+import type { PageFrame, PageFrameProps } from "@quartz-community/types"
+import type { ComponentChildren } from "preact"
+import TopHeaderConstructor from "../../../components/TopHeader"
 
 const TopHeader = TopHeaderConstructor()
 
@@ -294,33 +295,27 @@ export const CryunFrame: PageFrame = {
     right,
     footer: Footer,
   }: PageFrameProps) {
+    const renderSlot = (Component: (props: typeof componentData) => unknown): ComponentChildren =>
+      Component(componentData) as ComponentChildren
+    const Header = TopHeader as unknown as (props: typeof componentData) => unknown
+
     return (
       <>
-        <div class="page-header">
-          <TopHeader {...componentData} />
-        </div>
+        <div class="page-header">{renderSlot(Header)}</div>
         <div class="center">
           <div class="center-content">
             <div class="page-lede popover-hint">
-              {beforeBody.map((BodyComponent) => (
-                <BodyComponent {...componentData} />
-              ))}
+              {beforeBody.map((BodyComponent) => renderSlot(BodyComponent))}
             </div>
-            <Content {...componentData} />
+            {renderSlot(Content)}
           </div>
           <hr />
           <div class="page-footer">
-            {afterBody.map((BodyComponent) => (
-              <BodyComponent {...componentData} />
-            ))}
+            {afterBody.map((BodyComponent) => renderSlot(BodyComponent))}
           </div>
         </div>
-        <div class="right sidebar">
-          {right.map((BodyComponent) => (
-            <BodyComponent {...componentData} />
-          ))}
-        </div>
-        <Footer {...componentData} />
+        <div class="right sidebar">{right.map((BodyComponent) => renderSlot(BodyComponent))}</div>
+        {renderSlot(Footer)}
       </>
     )
   },

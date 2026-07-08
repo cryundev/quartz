@@ -16,6 +16,11 @@ if (fs.existsSync(componentsEntry)) {
   entryPoints["components/index"] = componentsEntry
 }
 
+const framesEntry = path.join(srcDir, "frames", "index.ts")
+if (fs.existsSync(framesEntry)) {
+  entryPoints["frames/index"] = framesEntry
+}
+
 if (Object.keys(entryPoints).length === 0) {
   throw new Error(`No plugin entry points found in ${srcDir}`)
 }

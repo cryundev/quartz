@@ -1,3 +1,261 @@
+// ../../components/registry.ts
+var ComponentRegistry = class {
+  components = /* @__PURE__ */ new Map()
+  instanceCache = /* @__PURE__ */ new Map()
+  optionOverrides = /* @__PURE__ */ new Map()
+  register(name, component, source, manifest) {
+    const existing = this.components.get(name)
+    if (existing && existing.source !== source) {
+      console.warn(`Component "${name}" is being overwritten by ${source}`)
+    }
+    this.components.set(name, { component, source, manifest })
+  }
+  get(name) {
+    return this.components.get(name)
+  }
+  getAll() {
+    return new Map(this.components)
+  }
+  /** Store option overrides for a plugin, keyed by plugin directory name. */
+  setOptionOverrides(pluginName, opts) {
+    if (!opts || Object.keys(opts).length === 0) return
+    this.optionOverrides.set(pluginName, { ...this.optionOverrides.get(pluginName), ...opts })
+    this.instanceCache.clear()
+  }
+  getOptionOverrides(pluginName) {
+    return this.optionOverrides.get(pluginName)
+  }
+  /**
+   * Instantiate a component constructor with options, returning a cached instance
+   * if the same constructor was already called with equivalent options.
+   * This prevents duplicate afterDOMLoaded scripts when the same component
+   * appears in multiple page-type layouts.
+   */
+  instantiate(constructor, options) {
+    const optsKey = options !== void 0 ? JSON.stringify(options) : ""
+    const ctorId =
+      constructor.__cacheId ?? (constructor.__cacheId = `ctor_${this.instanceCache.size}`)
+    const cacheKey = `${ctorId}:${optsKey}`
+    const cached = this.instanceCache.get(cacheKey)
+    if (cached) return cached
+    const instance = constructor(options)
+    this.instanceCache.set(cacheKey, instance)
+    return instance
+  }
+  getAllComponents() {
+    const seen = /* @__PURE__ */ new Set()
+    const results = []
+    for (const r of this.components.values()) {
+      if (seen.has(r.component)) continue
+      seen.add(r.component)
+      try {
+        let instance
+        if (typeof r.component === "function") {
+          const existing = this.findCachedInstance(r.component)
+          instance = existing ?? this.instantiate(r.component, void 0)
+        } else {
+          instance = r.component
+        }
+        if (instance) {
+          results.push(instance)
+        }
+      } catch {}
+    }
+    return results
+  }
+  findCachedInstance(constructor) {
+    const ctorId = constructor.__cacheId
+    if (!ctorId) return void 0
+    for (const [key, instance] of this.instanceCache) {
+      if (key.startsWith(`${ctorId}:`)) return instance
+    }
+    return void 0
+  }
+}
+var componentRegistry = new ComponentRegistry()
+
+// ../../util/resources.tsx
+import { jsx } from "preact/jsx-runtime"
+function concatenateResources(...resources) {
+  return resources.filter((resource) => resource !== void 0).flat()
+}
+
+// ../../util/path.ts
+import {
+  isFilePath,
+  isFullSlug,
+  isSimpleSlug,
+  isRelativeURL,
+  isAbsoluteURL,
+  getFullSlug,
+  slugifyFilePath,
+  simplifySlug,
+  joinSegments,
+  endsWith,
+  trimSuffix,
+  stripSlashes,
+  getFileExtension,
+  isFolderPath,
+  getAllSegmentPrefixes,
+  pathToRoot,
+  resolveRelative,
+  splitAnchor,
+  slugTag,
+  transformInternalLink,
+  transformLink,
+  normalizeHastElement,
+} from "@quartz-community/utils"
+
+// ../components/HeaderMenu.tsx
+import { jsx as jsx2 } from "preact/jsx-runtime"
+function getSlugSegments(slug) {
+  const simpleSlug = simplifySlug(slug)
+  if (simpleSlug === "/" || simpleSlug.length === 0) {
+    return []
+  }
+  return simpleSlug.split("/")
+}
+function getTopLevelSegment(slug) {
+  return getSlugSegments(slug)[0]
+}
+function formatMenuLabel(label) {
+  const normalized = label
+    .replace(/^\d+[-_\s]*/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+  return normalized.length > 0 ? normalized : label
+}
+function getItemRank(rawSlug, segments) {
+  const isFolderIndex = rawSlug.endsWith("/index")
+  const isRootFile = segments.length === 1 && !isFolderIndex
+  if (isFolderIndex) return 0
+  if (isRootFile) return 1
+  return 2
+}
+var HeaderMenu = ({ allFiles, fileData }) => {
+  if (allFiles.length === 0 || !fileData.slug) {
+    return null
+  }
+  const currentTopLevel = getTopLevelSegment(fileData.slug)
+  const itemsByKey = /* @__PURE__ */ new Map()
+  for (const file of allFiles) {
+    if (!file.slug) continue
+    const rawSlug = file.slug
+    const segments = getSlugSegments(rawSlug)
+    const key = segments[0]
+    if (!key || key === "tags" || key === "404") continue
+    const rank = getItemRank(rawSlug, segments)
+    const isFolder = rank !== 1
+    const existing = itemsByKey.get(key)
+    if (existing && existing.rank <= rank) continue
+    itemsByKey.set(key, {
+      key,
+      slug: isFolder ? `${key}/index` : rawSlug,
+      label: formatMenuLabel(file.frontmatter?.title ?? key),
+      isFolder,
+      rank,
+    })
+  }
+  const items = [...itemsByKey.values()].sort((a, b) => {
+    if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
+    return a.label.localeCompare(b.label, void 0, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  })
+  if (items.length === 0) {
+    return null
+  }
+  return /* @__PURE__ */ jsx2("nav", {
+    class: "header-menu",
+    "aria-label": "Top level sections",
+    children: /* @__PURE__ */ jsx2("ul", {
+      class: "header-menu-list",
+      children: items.map((item) => {
+        const topLevel = getTopLevelSegment(item.slug)
+        const isActive = topLevel !== void 0 && topLevel === currentTopLevel
+        return /* @__PURE__ */ jsx2("li", {
+          class: "header-menu-item",
+          children: /* @__PURE__ */ jsx2("a", {
+            class: isActive ? "active" : void 0,
+            href: resolveRelative(fileData.slug, item.slug),
+            children: item.label,
+          }),
+        })
+      }),
+    }),
+  })
+}
+HeaderMenu.css = `
+.header-menu {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.header-menu-list {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem 0.95rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.header-menu-list::-webkit-scrollbar {
+  display: none;
+}
+
+.header-menu-item {
+  flex: 0 0 auto;
+}
+
+.header-menu-item > a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0;
+  color: var(--darkgray);
+  font-family: var(--headerFont);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.78;
+}
+
+.header-menu-item > a.active {
+  color: var(--dark);
+  opacity: 1;
+}
+
+.header-menu-item > a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.55rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary), var(--tertiary));
+  border-radius: 999px;
+}
+
+@media all and (max-width: 800px) {
+  .header-menu {
+    overflow-x: auto;
+  }
+
+  .header-menu-list {
+    justify-content: flex-start;
+  }
+}
+`
+var HeaderMenu_default = () => HeaderMenu
+
 // ../../i18n/locales/en-US.ts
 var en_US_default = {
   propertyDefaults: {
@@ -2825,767 +3083,581 @@ var TRANSLATIONS = {
 var defaultTranslation = "en-US"
 var i18n = (locale) => TRANSLATIONS[locale ?? defaultTranslation]
 
-// ../../util/path.ts
-import {
-  isFilePath,
-  isFullSlug,
-  isSimpleSlug,
-  isRelativeURL,
-  isAbsoluteURL,
-  getFullSlug,
-  slugifyFilePath,
-  simplifySlug,
-  joinSegments,
-  endsWith,
-  trimSuffix,
-  stripSlashes,
-  getFileExtension,
-  isFolderPath,
-  getAllSegmentPrefixes,
-  pathToRoot,
-  resolveRelative,
-  splitAnchor,
-  slugTag,
-  transformInternalLink,
-  transformLink,
-  normalizeHastElement,
-} from "@quartz-community/utils"
-
-// ../../util/jsx.tsx
-import { toJsxRuntime } from "hast-util-to-jsx-runtime"
-import { Fragment, jsx, jsxs } from "preact/jsx-runtime"
-import { h } from "preact"
-
-// ../../util/trace.ts
-import { styleText } from "util"
-import process from "process"
-import { isMainThread } from "workerpool"
-var rootFile = /.*at file:/
-function trace(msg, err) {
-  let stack = err.stack ?? ""
-  const lines = []
-  lines.push("")
-  lines.push(
-    "\n" +
-      styleText(["bgRed", "black", "bold"], " ERROR ") +
-      "\n\n" +
-      styleText("red", ` ${msg}`) +
-      (err.message.length > 0 ? `: ${err.message}` : ""),
-  )
-  let reachedEndOfLegibleTrace = false
-  for (const line of stack.split("\n").slice(1)) {
-    if (reachedEndOfLegibleTrace) {
-      break
-    }
-    if (!line.includes("node_modules")) {
-      lines.push(` ${line}`)
-      if (rootFile.test(line)) {
-        reachedEndOfLegibleTrace = true
-      }
-    }
-  }
-  const traceMsg = lines.join("\n")
-  if (!isMainThread) {
-    throw new Error(traceMsg)
-  } else {
-    console.error(traceMsg)
-    process.exit(1)
-  }
-}
-
-// ../../util/jsx.tsx
-import { jsx as jsx2 } from "preact/jsx-runtime"
-function childrenToString(children) {
-  if (typeof children === "string") return children
-  if (Array.isArray(children)) return children.map(childrenToString).join("")
-  return String(children ?? "")
-}
-var customComponents = {
-  table: (props) =>
-    /* @__PURE__ */ jsx2("div", {
-      class: "table-container",
-      children: /* @__PURE__ */ jsx2("table", { ...props }),
-    }),
-  style: ({ children, ...rest }) =>
-    h("style", { ...rest, dangerouslySetInnerHTML: { __html: childrenToString(children) } }),
-  script: ({ children, ...rest }) =>
-    h("script", { ...rest, dangerouslySetInnerHTML: { __html: childrenToString(children) } }),
-}
-function htmlToJsx(fp, tree) {
-  try {
-    return toJsxRuntime(tree, {
-      Fragment,
-      jsx,
-      jsxs,
-      elementAttributeNameCase: "html",
-      components: customComponents,
-    })
-  } catch (e) {
-    trace(`Failed to parse Markdown in \`${fp}\` into JSX`, e)
-  }
-}
-
-// ../shared/PageList.tsx
-import { jsx as jsx3, jsxs as jsxs2 } from "preact/jsx-runtime"
-function getPageDate(page) {
-  return page.dates?.modified ?? page.dates?.published ?? page.dates?.created
-}
-function byDateAndAlphabeticalFolderFirst() {
-  return (f1, f2) => {
-    const f1IsFolder = isFolderPath(f1.slug ?? "")
-    const f2IsFolder = isFolderPath(f2.slug ?? "")
-    if (f1IsFolder && !f2IsFolder) return -1
-    if (!f1IsFolder && f2IsFolder) return 1
-    const f1Date = getPageDate(f1)
-    const f2Date = getPageDate(f2)
-    if (f1Date && f2Date) return f2Date.getTime() - f1Date.getTime()
-    if (f1Date && !f2Date) return -1
-    if (!f1Date && f2Date) return 1
-    const f1Title = f1.frontmatter?.title?.toLowerCase() ?? ""
-    const f2Title = f2.frontmatter?.title?.toLowerCase() ?? ""
-    return f1Title.localeCompare(f2Title, void 0, { numeric: true, sensitivity: "base" })
-  }
-}
-function getPageListLabels(locale) {
-  if (locale.toLowerCase().startsWith("ko")) {
-    return {
-      folder: "\uD3F4\uB354",
-      note: "\uBB38\uC11C",
-      updated: "\uCD5C\uADFC \uC218\uC815",
-      more: "\uAC1C \uB354",
-    }
-  }
-  return {
-    folder: "Folder",
-    note: "Note",
-    updated: "Updated",
-    more: "more",
-  }
-}
-function formatMoreLabel(locale, count, suffix) {
-  if (locale.toLowerCase().startsWith("ko")) {
-    return `+${count}${suffix}`
-  }
-  return `+${count} ${suffix}`
-}
-function DateDisplay({ date, locale }) {
-  return /* @__PURE__ */ jsx3("time", {
-    dateTime: date.toISOString(),
-    children: date.toLocaleDateString(locale, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    }),
+// ../components/SiteBrand.tsx
+import { jsx as jsx3, jsxs } from "preact/jsx-runtime"
+var SiteBrand = ({ fileData, cfg }) => {
+  const title = cfg.pageTitle ?? i18n(cfg.locale).propertyDefaults.title
+  const baseDir = pathToRoot(fileData.slug)
+  const iconPath = joinSegments(baseDir, "static/icon.png")
+  return /* @__PURE__ */ jsxs("a", {
+    class: "site-brand",
+    href: baseDir,
+    children: [
+      /* @__PURE__ */ jsx3("img", {
+        class: "site-brand-icon",
+        src: iconPath,
+        alt: "",
+        width: 40,
+        height: 40,
+      }),
+      /* @__PURE__ */ jsx3("span", { class: "site-brand-title", children: title }),
+    ],
   })
 }
-var PageList = ({ cfg, fileData, allFiles, limit, sort }) => {
-  const sorter = sort ?? byDateAndAlphabeticalFolderFirst()
-  let list = [...allFiles].sort(sorter)
-  if (limit) {
-    list = list.slice(0, limit)
+SiteBrand.css = `
+.site-brand {
+  display: grid;
+  grid-template-columns: 2.5rem max-content;
+  align-items: center;
+  column-gap: 0.85rem;
+  min-width: 0;
+  min-height: 2.5rem;
+  color: var(--dark);
+  line-height: 1;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.site-brand:hover {
+  color: var(--dark);
+}
+
+.site-brand-icon {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.8rem;
+  object-fit: cover;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.site-brand-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--titleFont);
+  font-size: clamp(1.2rem, 1rem + 0.9vw, 1.8rem);
+  font-weight: 700;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  white-space: nowrap;
+  text-wrap: nowrap;
+  overflow-wrap: normal;
+  margin: 0;
+  padding: 0;
+  transform: none;
+}
+`
+var SiteBrand_default = () => SiteBrand
+
+// ../components/TopHeader.tsx
+import { jsx as jsx4, jsxs as jsxs2 } from "preact/jsx-runtime"
+var SiteBrand2 = SiteBrand_default()
+var HeaderMenu2 = HeaderMenu_default()
+function externalComponent(name) {
+  const registered = componentRegistry.get(name)
+  if (!registered) return void 0
+  if (typeof registered.component === "function") {
+    return componentRegistry.instantiate(registered.component, void 0)
   }
-  const defaultDescription = i18n(cfg.locale).propertyDefaults.description
-  const labels = getPageListLabels(cfg.locale)
-  return /* @__PURE__ */ jsx3("ul", {
-    class: "section-ul",
-    children: list.map((page) => {
-      const isFolder = isFolderPath(page.slug ?? "")
-      const title = page.frontmatter?.title
-      const folderPreview = isFolder ? page.folderCardPreview : void 0
-      const date = getPageDate(page)
-      const description =
-        typeof page.description === "string" && page.description !== defaultDescription
-          ? page.description.trim()
-          : ""
-      const tags = page.frontmatter?.tags ?? []
-      return /* @__PURE__ */ jsx3(
-        "li",
-        {
-          class: `section-li ${isFolder ? "is-folder" : "is-note"}`,
-          children: /* @__PURE__ */ jsxs2("div", {
-            class: "section",
-            children: [
-              /* @__PURE__ */ jsxs2("div", {
-                class: "section-head",
-                children: [
-                  /* @__PURE__ */ jsx3("span", {
-                    class: "entry-kind",
-                    children: isFolder ? labels.folder : labels.note,
-                  }),
-                  /* @__PURE__ */ jsx3("p", {
-                    class: "meta",
-                    children:
-                      date && /* @__PURE__ */ jsx3(DateDisplay, { date, locale: cfg.locale }),
-                  }),
-                ],
-              }),
-              /* @__PURE__ */ jsxs2("div", {
-                class: "desc",
-                children: [
-                  /* @__PURE__ */ jsx3("h3", {
-                    children: /* @__PURE__ */ jsx3("a", {
-                      href: resolveRelative(fileData.slug, page.slug),
-                      class: "internal",
-                      children: title,
-                    }),
-                  }),
-                  description.length > 0 &&
-                    /* @__PURE__ */ jsx3("p", { class: "summary", children: description }),
-                  isFolder &&
-                    folderPreview &&
-                    folderPreview.items.length > 0 &&
-                    /* @__PURE__ */ jsxs2("ul", {
-                      class: "folder-preview",
-                      children: [
-                        folderPreview.items.map((item) =>
-                          /* @__PURE__ */ jsx3(
-                            "li",
-                            {
-                              class: `folder-preview-item ${item.isFolder ? "is-folder" : "is-note"}`,
-                              children: /* @__PURE__ */ jsx3("a", {
-                                href: resolveRelative(fileData.slug, item.slug),
-                                class: "internal",
-                                children: item.title,
-                              }),
-                            },
-                            item.slug,
-                          ),
-                        ),
-                        folderPreview.remainingCount > 0 &&
-                          /* @__PURE__ */ jsx3("li", {
-                            class: "folder-preview-more",
-                            children: formatMoreLabel(
-                              cfg.locale,
-                              folderPreview.remainingCount,
-                              labels.more,
-                            ),
-                          }),
-                      ],
-                    }),
-                ],
-              }),
-              isFolder &&
-                date &&
-                folderPreview &&
-                /* @__PURE__ */ jsxs2("p", {
-                  class: "meta folder-meta",
-                  children: [
-                    /* @__PURE__ */ jsx3("span", { class: "meta-label", children: labels.updated }),
-                    /* @__PURE__ */ jsx3(DateDisplay, { date, locale: cfg.locale }),
-                  ],
-                }),
-              /* @__PURE__ */ jsx3("div", {
-                class: "section-footer",
-                children:
-                  tags.length > 0 &&
-                  /* @__PURE__ */ jsx3("ul", {
-                    class: "tags",
-                    children: tags.map((tag) =>
-                      /* @__PURE__ */ jsx3("li", {
-                        children: /* @__PURE__ */ jsx3("a", {
-                          class: "internal tag-link",
-                          href: resolveRelative(fileData.slug, `tags/${tag}`),
-                          children: tag,
-                        }),
-                      }),
-                    ),
-                  }),
-              }),
-            ],
-          }),
-        },
-        page.slug,
-      )
-    }),
+  return registered.component
+}
+var TopHeader = (props) => {
+  const Search = externalComponent("search") ?? externalComponent("Search")
+  const Darkmode = externalComponent("darkmode") ?? externalComponent("Darkmode")
+  const ReaderMode = externalComponent("reader-mode") ?? externalComponent("ReaderMode")
+  return /* @__PURE__ */ jsxs2("div", {
+    class: "top-header",
+    children: [
+      /* @__PURE__ */ jsx4("div", {
+        class: "top-header-brand",
+        children: /* @__PURE__ */ jsx4(SiteBrand2, { ...props }),
+      }),
+      /* @__PURE__ */ jsx4("div", {
+        class: "top-header-menu",
+        children: /* @__PURE__ */ jsx4(HeaderMenu2, { ...props }),
+      }),
+      /* @__PURE__ */ jsx4("div", {
+        class: "top-header-search",
+        children: Search && /* @__PURE__ */ jsx4(Search, { ...props }),
+      }),
+      /* @__PURE__ */ jsxs2("div", {
+        class: "top-header-actions",
+        children: [
+          Darkmode && /* @__PURE__ */ jsx4(Darkmode, { ...props }),
+          ReaderMode && /* @__PURE__ */ jsx4(ReaderMode, { ...props }),
+        ],
+      }),
+    ],
   })
 }
-var pageListStyle = `
-.page-listing {
-  margin-top: 0;
+TopHeader.css = concatenateResources(
+  SiteBrand2.css,
+  HeaderMenu2.css,
+  `
+.top-header {
+  --header-surface-start: color-mix(in srgb, var(--light) 90%, white);
+  --header-surface-end: color-mix(in srgb, var(--light) 98%, white);
+  --header-border: color-mix(in srgb, var(--lightgray) 76%, var(--secondary) 10%);
+  --header-shadow-primary: 0 20px 40px rgba(27, 33, 48, 0.08);
+  --header-shadow-secondary: 0 8px 16px rgba(27, 33, 48, 0.04);
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) minmax(20rem, 29rem);
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: stretch;
+  column-gap: 2rem;
+  row-gap: 0.55rem;
+  width: 100%;
+  min-height: 7.25rem;
+  padding: 1.25rem 1.55rem;
+  box-sizing: border-box;
+  border-radius: 1.5rem;
+  border: 1px solid var(--header-border);
+  background: linear-gradient(180deg, var(--header-surface-start) 0%, var(--header-surface-end) 100%);
+  box-shadow: var(--header-shadow-primary), var(--header-shadow-secondary);
+  backdrop-filter: blur(18px);
+}
+
+:root[saved-theme="dark"] .top-header {
+  --header-surface-start: color-mix(in srgb, var(--page-surface-muted) 97%, #343638);
+  --header-surface-end: color-mix(in srgb, var(--page-surface) 99%, #2f3133);
+  --header-border: color-mix(in srgb, var(--lightgray) 86%, rgba(255, 255, 255, 0.05));
+  --header-shadow-primary: 0 16px 34px rgba(0, 0, 0, 0.16);
+  --header-shadow-secondary: 0 6px 14px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.top-header-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 2.5rem;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: start;
+}
+
+.top-header-menu {
+  min-width: 0;
+  max-width: 100%;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+  justify-self: end;
+  padding-bottom: 0.15rem;
+}
+
+.top-header-search {
+  grid-column: 3;
+  grid-row: 1;
+  width: min(100%, 30rem);
+  justify-self: end;
+  align-self: center;
+}
+
+.top-header-search > .search {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+}
+
+.top-header-actions {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.top-header-actions .darkmode,
+.top-header-actions .readermode {
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--lightgray) 72%, var(--secondary) 12%);
+  background: color-mix(in srgb, var(--light) 88%, white);
+  box-shadow: 0 8px 20px rgba(27, 33, 48, 0.06);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.top-header-actions .darkmode:hover,
+.top-header-actions .readermode:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--secondary) 28%, var(--lightgray));
+  box-shadow: 0 12px 24px rgba(27, 33, 48, 0.1);
+}
+
+.top-header-actions .darkmode svg,
+.top-header-actions .readermode svg {
+  width: 18px;
+  height: 18px;
+  top: calc(50% - 9px);
+  left: calc(50% - 9px);
+}
+
+@media all and (max-width: 800px) {
+  .top-header {
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    row-gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .top-header-brand,
+  .top-header-menu,
+  .top-header-search,
+  .top-header-actions {
+    grid-column: 1;
+    justify-self: stretch;
+  }
+
+  .top-header-brand {
+    grid-row: 1;
+  }
+
+  .top-header-menu {
+    grid-row: 2;
+    align-self: stretch;
+    justify-self: stretch;
+    padding-bottom: 0;
+  }
+
+  .top-header-search {
+    grid-row: 3;
+    width: 100%;
+  }
+
+  .top-header-actions {
+    grid-row: 4;
+    justify-content: flex-start;
+  }
+}
+`,
+)
+var TopHeader_default = () => TopHeader
+
+// src/frames/CryunFrame.tsx
+import { Fragment, jsx as jsx5, jsxs as jsxs3 } from "preact/jsx-runtime"
+var TopHeader2 = TopHeader_default()
+function cssText(resource) {
+  if (!resource) return ""
+  return Array.isArray(resource) ? resource.join("\n") : resource
+}
+var frameStyle = `
+body {
+  background:
+    radial-gradient(circle at top right, rgba(132, 165, 157, 0.16), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--light) 84%, white) 0%, var(--light) 100%);
+}
+
+:root[saved-theme="dark"] body {
+  background:
+    radial-gradient(circle at top right, rgba(141, 162, 172, 0.1), transparent 30%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--light) 98%, #1b1c1e) 0%,
+      color-mix(in srgb, var(--light) 94%, #141516) 100%
+    );
+}
+
+.page[data-frame="cryun"] {
+  --layout-gap: 1.35rem;
+  --page-surface: color-mix(in srgb, var(--light) 88%, white);
+  --page-surface-muted: color-mix(in srgb, var(--light) 76%, white);
+  --page-border: color-mix(in srgb, var(--lightgray) 70%, var(--secondary) 10%);
+  --page-shadow: 0 28px 60px rgba(27, 33, 48, 0.08), 0 10px 20px rgba(27, 33, 48, 0.05);
+  width: min(1460px, calc(100% - 2rem));
+  max-width: 1460px;
+  margin: 0 auto 3rem;
+}
+
+:root[saved-theme="dark"] .page[data-frame="cryun"] {
+  --page-surface: color-mix(in srgb, var(--light) 97%, #2b2d2f);
+  --page-surface-muted: color-mix(in srgb, var(--light) 94%, #313335);
+  --page-border: color-mix(in srgb, var(--lightgray) 82%, var(--secondary) 10%);
+  --page-shadow: 0 22px 48px rgba(0, 0, 0, 0.22), 0 10px 22px rgba(0, 0, 0, 0.16);
+}
+
+.page[data-frame="cryun"] > #quartz-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "grid-header grid-header"
+    "grid-center grid-sidebar-right"
+    "grid-footer grid-sidebar-right";
+  column-gap: clamp(1.5rem, 2vw, 2.5rem);
+  row-gap: var(--layout-gap);
+}
+
+.page[data-frame="cryun"] > #quartz-body:has(> .sidebar.right:empty) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "grid-header"
+    "grid-center"
+    "grid-footer";
+}
+
+.page[data-frame="cryun"] > #quartz-body:has(> .sidebar.right:empty) > .sidebar.right {
+  display: none;
+}
+
+.page[data-frame="cryun"] .page-header {
+  grid-area: grid-header;
+  width: 100%;
+  margin: 1.5rem 0 0;
+}
+
+.page[data-frame="cryun"] .center {
+  grid-area: grid-center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.page[data-frame="cryun"] .sidebar.right {
+  grid-area: grid-sidebar-right;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  align-self: start;
+  position: sticky;
+  top: 1.4rem;
+  height: fit-content;
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.2rem;
+  box-sizing: border-box;
 }
 
-.page-listing > p {
-  margin: 0;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gray);
-}
-
-.page-listing > div {
+.page[data-frame="cryun"] .sidebar.right > * {
+  background: var(--page-surface-muted);
+  border: 1px solid var(--page-border);
+  border-radius: 1.3rem;
+  padding: 1.1rem 1.15rem;
+  box-shadow: 0 14px 32px rgba(27, 33, 48, 0.06);
+  backdrop-filter: blur(10px);
   width: 100%;
+  box-sizing: border-box;
+  flex: 0 0 auto;
 }
 
-.folder-content-view .page-listing,
-.tag-content-view .page-listing {
-  gap: 1.15rem;
+.page[data-frame="cryun"] .center-content,
+.page[data-frame="cryun"] .page-footer,
+.page[data-frame="cryun"] hr,
+.page[data-frame="cryun"] footer {
+  width: 100%;
+  max-width: none;
 }
 
-.folder-content-view .page-listing > p,
-.folder-content-view .page-listing > div,
-.tag-content-view .page-listing > p,
-.tag-content-view .page-listing > div,
-.tag-content-view > .tag-summary,
-.tag-section {
-  width: min(100%, 56.75rem);
+.page[data-frame="cryun"] .center-content {
+  background: var(--page-surface);
+  border: 1px solid var(--page-border);
+  border-radius: 1.7rem;
+  box-shadow: var(--page-shadow);
+  overflow: hidden;
+  justify-self: stretch;
+}
+
+.page[data-frame="cryun"] .center-content > .page-lede {
+  margin-top: 0;
+  padding: 2.35rem 2.7rem 1.5rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--page-surface-muted) 82%, white) 0%,
+    var(--page-surface) 100%
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--page-border) 88%, transparent);
+}
+
+.page[data-frame="cryun"] .center-content > .page-lede:empty {
+  display: none;
+}
+
+.page[data-frame="cryun"] .center-content > .page-lede > * {
+  max-width: 58rem;
   margin-left: auto;
   margin-right: auto;
 }
 
-.tag-content-view > .tag-summary {
+.page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint {
   margin-top: 0;
-  color: var(--gray);
-  font-size: 0.9rem;
+  padding: 1.95rem 2.7rem 3.35rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.tag-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint > * {
+  max-width: 58rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.tag-section > h2 {
-  margin-top: 0;
-  margin-bottom: 0.85rem;
-  font-size: 1.05rem;
-}
-
-.tag-section > p {
-  margin-top: 0;
-  margin-bottom: 0.85rem;
-  color: color-mix(in srgb, var(--darkgray) 82%, var(--gray) 18%);
-}
-
-.popover-hint > article:empty {
-  display: none;
-}
-
-.popover-hint > article:not(:empty) {
-  margin-bottom: 2rem;
-  padding: 1.45rem 1.6rem;
-  background: color-mix(in srgb, var(--page-surface-muted) 76%, white 24%);
-  border: 1px solid color-mix(in srgb, var(--page-border) 82%, transparent);
-  border-radius: 1.25rem;
-}
-
-.popover-hint > article:not(:empty) > :first-child {
+.page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint > :first-child {
   margin-top: 0;
 }
 
-.popover-hint > article:not(:empty) > :last-child {
-  margin-bottom: 0;
+.page[data-frame="cryun"] .center-content:has(> .page-lede:empty) > :not(.page-lede).popover-hint {
+  padding-top: 2.6rem;
 }
 
-.popover-hint > article:not(:empty) + .page-listing {
-  padding-top: 1.85rem;
-  border-top: 1px solid color-mix(in srgb, var(--page-border) 82%, transparent);
+.page[data-frame="cryun"] .page-footer {
+  margin-top: 0.5rem;
+  align-self: stretch;
 }
 
-ul.section-ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 0;
-  display: grid;
-  gap: 1rem;
+.page[data-frame="cryun"] hr {
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--lightgray) 82%, transparent);
+  margin: 0.75rem auto 0;
+  align-self: stretch;
 }
 
-li.section-li {
-  margin: 0;
+.page[data-frame="cryun"] footer {
+  grid-area: grid-footer;
+  margin-left: 0;
+  align-self: stretch;
 }
 
-li.section-li > .section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  padding: 1.35rem 1.4rem;
-  background: color-mix(in srgb, var(--page-surface-muted) 74%, white 26%);
-  border: 1px solid color-mix(in srgb, var(--page-border) 80%, transparent);
-  border-radius: 1.25rem;
-  box-shadow: 0 14px 34px rgba(27, 33, 48, 0.06);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+.page[data-frame="cryun"] article {
+  font-size: 1.02rem;
+  line-height: 1.9;
 }
 
-li.section-li > .section:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--page-border) 55%, var(--secondary) 30%);
-  box-shadow: 0 18px 38px rgba(27, 33, 48, 0.1);
+.page[data-frame="cryun"] article p,
+.page[data-frame="cryun"] article ul,
+.page[data-frame="cryun"] article ol,
+.page[data-frame="cryun"] article li {
+  line-height: 1.9;
 }
 
-li.section-li.is-folder > .section {
-  background: color-mix(in srgb, var(--page-surface-muted) 88%, var(--tertiary) 12%);
+.page[data-frame="cryun"] article img {
+  display: block;
+  max-width: 100%;
+  margin: 2rem auto;
+  border-radius: 1.15rem;
+  box-shadow: 0 20px 45px rgba(27, 33, 48, 0.12);
 }
 
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+.page[data-frame="cryun"] blockquote {
+  margin: 1.4rem 0;
+  border-left: 4px solid color-mix(in srgb, var(--secondary) 72%, var(--tertiary));
+  padding: 0.9rem 0 0.9rem 1.2rem;
+  border-radius: 0 1rem 1rem 0;
+  background: color-mix(in srgb, var(--highlight) 88%, white);
 }
 
-.entry-kind {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.32rem 0.72rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--page-border) 74%, transparent);
-  background: color-mix(in srgb, var(--highlight) 45%, white 55%);
-  color: var(--secondary);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.page[data-frame="cryun"] pre {
+  border-radius: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid color-mix(in srgb, var(--lightgray) 82%, var(--secondary) 8%);
 }
 
-.entry-kind::before {
-  content: "";
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.72;
+.page[data-frame="cryun"] .table-container {
+  width: calc(100% - 0.5rem);
+  margin: 1.3rem auto 1.9rem;
+  padding: 0 0.25rem;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
-.section .meta {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--gray);
-  white-space: nowrap;
+.page[data-frame="cryun"] .table-container > table {
+  width: 100%;
+  min-width: max-content;
 }
 
-.section .desc {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
+@media all and (max-width: 1200px) {
+  .page[data-frame="cryun"] > #quartz-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "grid-header"
+      "grid-center"
+      "grid-sidebar-right"
+      "grid-footer";
+  }
 
-.section .desc > h3 {
-  margin: 0;
-  font-size: 1.12rem;
-  line-height: 1.45;
-}
-
-.section .desc > h3 > a {
-  background-color: transparent;
-  padding: 0;
-  line-height: inherit;
-  color: var(--dark);
-}
-
-.section .desc > .summary {
-  margin: 0;
-  color: color-mix(in srgb, var(--darkgray) 84%, var(--gray) 16%);
-  font-size: 0.95rem;
-  line-height: 1.72;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.section .folder-preview {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0.25rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.section .folder-preview-item {
-  list-style: none;
-}
-
-.section .folder-preview-item a.internal {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.58rem 0.75rem;
-  border-radius: 0.9rem;
-  background: color-mix(in srgb, var(--highlight) 34%, white 66%);
-  border: 1px solid color-mix(in srgb, var(--page-border) 66%, transparent);
-  color: color-mix(in srgb, var(--darkgray) 88%, var(--gray) 12%);
-  line-height: 1.25;
-}
-
-.section .folder-preview-item a.internal::before {
-  content: "";
-  width: 0.42rem;
-  height: 0.42rem;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.65;
-  flex: 0 0 auto;
-}
-
-.section .folder-preview-more {
-  list-style: none;
-  color: var(--gray);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  padding-left: 0.1rem;
-}
-
-.section .folder-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: -0.1rem;
-}
-
-.section .folder-meta .meta-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.72;
-}
-
-.section > .tags,
-.section-footer .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.1rem 0 0;
-  padding: 0;
-}
-
-.section > .tags > li,
-.section-footer .tags > li {
-  list-style: none;
-}
-
-.section > .tags a.internal,
-.section-footer .tags a.internal {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.28rem 0.6rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--highlight) 58%, white 42%);
-  line-height: 1.2;
-  font-size: 0.78rem;
+  .page[data-frame="cryun"] .sidebar.right {
+    position: initial;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
 }
 
 @media all and (max-width: 800px) {
-  .popover-hint > article:not(:empty) {
-    margin-bottom: 1.5rem;
-    padding: 1.15rem 1.2rem;
+  .page[data-frame="cryun"] {
+    width: calc(100% - 1rem);
+    margin-bottom: 2rem;
   }
 
-  .popover-hint > article:not(:empty) + .page-listing {
-    padding-top: 1.5rem;
+  .page[data-frame="cryun"] .page-header {
+    margin-top: 1rem;
   }
 
-  .folder-content-view .page-listing > p,
-  .folder-content-view .page-listing > div,
-  .tag-content-view .page-listing > p,
-  .tag-content-view .page-listing > div,
-  .tag-content-view > .tag-summary,
-  .tag-section {
-    width: 100%;
+  .page[data-frame="cryun"] .center-content > .page-lede {
+    padding: 1.65rem 1.2rem 1.1rem;
+  }
+
+  .page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint {
+    padding: 1.5rem 1.2rem 2.35rem;
+  }
+
+  .page[data-frame="cryun"] .center-content,
+  .page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint,
+  .page[data-frame="cryun"] .center-content > :not(.page-lede).popover-hint > * {
+    min-width: 0;
   }
 }
 `
-PageList.css = pageListStyle
-
-// src/components/TagContent.tsx
-import { Fragment as Fragment2, jsx as jsx4, jsxs as jsxs3 } from "preact/jsx-runtime"
-var defaultOptions = {
-  numPages: 10,
-}
-function isListed(file) {
-  return file.unlisted !== true
-}
-var TagContent_default = (opts) => {
-  const options = { ...defaultOptions, ...opts }
-  const TagContent = (props) => {
-    const { tree, fileData, allFiles, cfg } = props
-    const slug = fileData.slug
-    if (!(slug?.startsWith("tags/") || slug === "tags")) {
-      throw new Error(`Component "CryunTagContent" tried to render a non-tag page: ${slug}`)
-    }
-    const tag = simplifySlug(slug.slice("tags/".length))
-    const locale = cfg.locale
-    const allPagesWithTag = (targetTag) =>
-      allFiles
-        .filter(isListed)
-        .filter((file) =>
-          (file.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes).includes(targetTag),
-        )
-    const hastRoot = tree
-    const content =
-      hastRoot.children.length === 0
-        ? fileData.description
-        : htmlToJsx(fileData.filePath ?? "content/tags/index.md", hastRoot)
-    const classes = (fileData.frontmatter?.cssclasses ?? []).join(" ")
-    if (tag === "/") {
-      const tags = [
-        ...new Set(
-          allFiles
-            .filter(isListed)
-            .flatMap((data) => data.frontmatter?.tags ?? [])
-            .flatMap(getAllSegmentPrefixes),
-        ),
-      ].sort((a, b) => a.localeCompare(b))
-      const tagItemMap = /* @__PURE__ */ new Map()
-      for (const currentTag of tags) {
-        tagItemMap.set(currentTag, allPagesWithTag(currentTag))
-      }
-      return /* @__PURE__ */ jsxs3("div", {
-        class: "popover-hint tag-content-view",
-        children: [
-          /* @__PURE__ */ jsx4("article", {
-            class: classes,
-            children: /* @__PURE__ */ jsx4("div", {
-              class: "markdown-preview-view markdown-rendered",
-              children: /* @__PURE__ */ jsx4("p", { children: content }),
-            }),
-          }),
-          /* @__PURE__ */ jsx4("p", {
-            class: "tag-summary",
-            children: i18n(locale).pages.tagContent.totalTags({ count: tags.length }),
-          }),
-          /* @__PURE__ */ jsx4("div", {
-            class: "tag-sections",
-            children: tags.map((currentTag) => {
-              const pages2 = tagItemMap.get(currentTag)
-              const listProps2 = {
-                ...props,
-                allFiles: pages2,
-              }
-              const pageListContent2 = PageList({
-                ...listProps2,
-                limit: options.numPages,
-                sort: options.sort,
-              })
-              const contentPage = allFiles.find((file) => file.slug === `tags/${currentTag}`)
-              const root = contentPage?.filePath ? contentPage.htmlAst : void 0
-              const tagDesc =
-                !root || root.children.length === 0
-                  ? contentPage?.description
-                  : htmlToJsx(contentPage.filePath, root)
-              const tagListingPage = `/tags/${currentTag}`
-              const href = resolveRelative(slug, tagListingPage)
-              return /* @__PURE__ */ jsxs3("section", {
-                class: "tag-section",
-                children: [
-                  /* @__PURE__ */ jsx4("h2", {
-                    children: /* @__PURE__ */ jsx4("a", {
-                      class: "internal tag-link",
-                      href,
-                      children: currentTag,
-                    }),
-                  }),
-                  tagDesc && /* @__PURE__ */ jsx4("p", { children: tagDesc }),
-                  /* @__PURE__ */ jsxs3("div", {
-                    class: "page-listing",
-                    children: [
-                      /* @__PURE__ */ jsxs3("p", {
-                        children: [
-                          i18n(locale).pages.tagContent.itemsUnderTag({ count: pages2.length }),
-                          pages2.length > options.numPages &&
-                            /* @__PURE__ */ jsxs3(Fragment2, {
-                              children: [
-                                " ",
-                                /* @__PURE__ */ jsx4("span", {
-                                  children: i18n(locale).pages.tagContent.showingFirst({
-                                    count: options.numPages,
-                                  }),
-                                }),
-                              ],
-                            }),
-                        ],
-                      }),
-                      pageListContent2,
-                    ],
-                  }),
-                ],
-              })
-            }),
-          }),
-        ],
-      })
-    }
-    const pages = allPagesWithTag(tag)
-    const listProps = {
-      ...props,
-      allFiles: pages,
-    }
-    const pageListContent = PageList({
-      ...listProps,
-      sort: options.sort,
-    })
-    return /* @__PURE__ */ jsxs3("div", {
-      class: "popover-hint tag-content-view",
+var CryunFrame = {
+  name: "cryun",
+  css: `${cssText(TopHeader2.css)}
+${frameStyle}`,
+  render({ componentData, beforeBody, pageBody: Content, afterBody, right, footer: Footer }) {
+    const renderSlot = (Component) => Component(componentData)
+    const Header = TopHeader2
+    return /* @__PURE__ */ jsxs3(Fragment, {
       children: [
-        /* @__PURE__ */ jsx4("article", {
-          class: classes,
-          children: /* @__PURE__ */ jsx4("div", {
-            class: "markdown-preview-view markdown-rendered",
-            children: content,
-          }),
-        }),
+        /* @__PURE__ */ jsx5("div", { class: "page-header", children: renderSlot(Header) }),
         /* @__PURE__ */ jsxs3("div", {
-          class: "page-listing",
+          class: "center",
           children: [
-            /* @__PURE__ */ jsx4("p", {
-              children: i18n(locale).pages.tagContent.itemsUnderTag({ count: pages.length }),
+            /* @__PURE__ */ jsxs3("div", {
+              class: "center-content",
+              children: [
+                /* @__PURE__ */ jsx5("div", {
+                  class: "page-lede popover-hint",
+                  children: beforeBody.map((BodyComponent) => renderSlot(BodyComponent)),
+                }),
+                renderSlot(Content),
+              ],
             }),
-            /* @__PURE__ */ jsx4("div", { children: pageListContent }),
+            /* @__PURE__ */ jsx5("hr", {}),
+            /* @__PURE__ */ jsx5("div", {
+              class: "page-footer",
+              children: afterBody.map((BodyComponent) => renderSlot(BodyComponent)),
+            }),
           ],
         }),
+        /* @__PURE__ */ jsx5("div", {
+          class: "right sidebar",
+          children: right.map((BodyComponent) => renderSlot(BodyComponent)),
+        }),
+        renderSlot(Footer),
       ],
     })
-  }
-  TagContent.css = pageListStyle
-  return TagContent
-}
-
-// src/index.ts
-var tagMatcher = ({ slug }) => {
-  return slug.startsWith("tags/") || slug === "tags"
-}
-var CryunTagPage = (opts) => ({
-  name: "CryunTagPage",
-  priority: 10,
-  match: tagMatcher,
-  generate({ content, cfg }) {
-    const allFiles = content.map((c) => c[1].data).filter((d) => d.unlisted !== true)
-    const locale = cfg.locale ?? "en-US"
-    const tags = new Set(
-      allFiles.flatMap((data) => data.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes),
-    )
-    tags.add("index")
-    const existingTagSlugs = /* @__PURE__ */ new Set()
-    for (const [, file] of content) {
-      const slug = file.data.slug
-      if (slug?.startsWith("tags/")) {
-        existingTagSlugs.add(slug)
-      }
-    }
-    const virtualPages = []
-    for (const tag of tags) {
-      const slug = joinSegments("tags", tag)
-      if (existingTagSlugs.has(slug)) continue
-      const title =
-        tag === "index"
-          ? i18n(locale).pages.tagContent.tagIndex
-          : opts?.prefixTags
-            ? `${i18n(locale).pages.tagContent.tag}: ${tag}`
-            : tag
-      virtualPages.push({
-        slug,
-        title,
-        data: {},
-      })
-    }
-    return virtualPages
   },
-  layout: "tag",
-  body: TagContent_default,
-})
-var src_default = CryunTagPage
-export { CryunTagPage, src_default as default }
+}
+export { CryunFrame }

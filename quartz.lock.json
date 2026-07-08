@@ -91,6 +91,12 @@
       "commit": "local",
       "installedAt": "2026-07-08T02:33:54.151Z"
     },
+    "cryun-frame": {
+      "source": "./quartz/custom/cryun-frame",
+      "resolved": "./quartz/custom/cryun-frame",
+      "commit": "local",
+      "installedAt": "2026-07-08T04:50:48.039Z"
+    },
     "cryun-folder-page": {
       "source": "./quartz/custom/cryun-folder-page",
       "resolved": "./quartz/custom/cryun-folder-page",
