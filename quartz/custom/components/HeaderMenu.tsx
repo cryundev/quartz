@@ -61,7 +61,7 @@ const HeaderMenu: QuartzComponent = ({ allFiles, fileData }: QuartzComponentProp
     const segments = getSlugSegments(rawSlug)
     const key = segments[0]
 
-    if (!key || key === "tags") continue
+    if (!key || key === "tags" || key === "404") continue
 
     const rank = getItemRank(rawSlug, segments)
     const isFolder = rank !== 1
