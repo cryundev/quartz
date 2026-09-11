@@ -85,6 +85,12 @@
       "commit": "c003199fb842969d43ee9e0f54120a85e588260e",
       "installedAt": "2026-07-08T02:22:06.341Z"
     },
+    "cryun-theme": {
+      "source": "./quartz/custom/cryun-theme",
+      "resolved": "/home/cry/quartz/quartz/custom/cryun-theme",
+      "commit": "local",
+      "installedAt": "2026-09-11T02:05:33.056Z"
+    },
     "darkmode": {
       "source": "github:quartz-community/darkmode",
       "resolved": "https://github.com/quartz-community/darkmode.git",

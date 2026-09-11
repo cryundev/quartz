@@ -16,31 +16,43 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Schibsted Grotesk
-      body: Source Sans Pro
+      header:
+        name: Noto Sans KR
+        weights: [400, 500, 600, 700]
+        includeItalic: false
+      body:
+        name: Noto Sans KR
+        weights: [400, 500, 600, 700]
+        includeItalic: false
       code: IBM Plex Mono
     colors:
       lightMode:
-        light: "#faf8f8"
-        lightgray: "#e5e5e5"
-        gray: "#b8b8b8"
-        darkgray: "#4e4e4e"
-        dark: "#2b2b2b"
-        secondary: "#284b63"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
+        light: "#f6f7f9"
+        lightgray: "#dfe4ec"
+        gray: "#697586"
+        darkgray: "#3e495b"
+        dark: "#202c40"
+        secondary: "#345b96"
+        tertiary: "#426d58"
+        highlight: rgba(52, 91, 150, 0.08)
         textHighlight: "#fff23688"
       darkMode:
-        light: "#161618"
-        lightgray: "#393639"
-        gray: "#646464"
-        darkgray: "#d4d4d4"
-        dark: "#ebebec"
-        secondary: "#7b97aa"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
+        light: "#15191f"
+        lightgray: "#343c49"
+        gray: "#9aa7bb"
+        darkgray: "#c8d0dd"
+        dark: "#edf1f8"
+        secondary: "#9cbcf0"
+        tertiary: "#a2ccb5"
+        highlight: rgba(156, 188, 240, 0.1)
         textHighlight: "#b3aa0288"
 plugins:
+  - source: ./quartz/custom/cryun-theme
+    enabled: true
+    order: 100
+    layout:
+      position: right
+      priority: 20
   - source: github:quartz-community/created-modified-date
     enabled: true
     options:
@@ -73,7 +85,7 @@ plugins:
     layout:
       position: right
       priority: 10
-      display: desktop-only
+      display: all
   - source: github:quartz-community/crawl-links
     enabled: true
     options:
@@ -100,7 +112,7 @@ plugins:
     enabled: false
     order: 92
   - source: github:quartz-community/fonts
-    enabled: true
+    enabled: false
   - source: github:quartz-community/remove-draft
     enabled: true
   - source: github:quartz-community/explicit-publish
@@ -127,7 +139,7 @@ plugins:
   - source: github:quartz-community/tag-page
     enabled: true
   - source: github:quartz-community/explorer
-    enabled: true
+    enabled: false
     layout:
       position: right
       priority: 20
@@ -137,6 +149,7 @@ plugins:
       position: right
       priority: 40
       display: desktop-only
+      condition: not-index
   - source: github:quartz-community/search
     enabled: true
     layout:
@@ -262,21 +275,24 @@ layout:
     toolbar:
       priority: 35
       direction: row
-      gap: 0.5rem
+      gap: 0.65rem
   byPageType:
     "404":
       positions:
         beforeBody: []
         left: []
         right: []
-    content: {}
+    content:
+      template: cryun
     folder:
+      template: cryun
       exclude:
         - table-of-contents
         - backlinks
         - graph
         - reader-mode
     tag:
+      template: cryun
       exclude:
         - table-of-contents
         - backlinks

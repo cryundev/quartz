@@ -1,0 +1,396 @@
+// All structural overrides belong to the registered frame. Canvas, Bases and
+// the minimal 404 frame retain their own layout and component behavior.
+.page[data-frame="cryun"] {
+  --cryun-surface: #fff;
+  --cryun-soft: #f1f4f8;
+  --cryun-radius: 12px;
+  width: min(1400px, calc(100% - 80px));
+  max-width: none;
+  margin: 0 auto;
+
+  > #quartz-body {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "grid-header grid-header" "grid-center grid-sidebar-right" "grid-footer grid-footer";
+    column-gap: 44px;
+    row-gap: 0;
+    padding: 0;
+    min-height: 100svh;
+  }
+
+  .cryun-header {
+    grid-area: grid-header;
+    margin: 0 0 36px;
+    min-width: 0;
+  }
+
+  .cryun-header-row {
+    padding: 28px 0 24px;
+  }
+
+  .cryun-header-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+
+    > .flex-component {
+      width: min(460px, 50%);
+      align-items: center;
+    }
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+    letter-spacing: -0.04em;
+    line-height: 1.3;
+    flex-shrink: 0;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--dark);
+    }
+    a::before {
+      content: "C";
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px 10px 3px 10px;
+      background: var(--secondary);
+      color: var(--cryun-surface);
+      font-family: var(--codeFont);
+      font-size: 22px;
+      font-weight: 500;
+    }
+  }
+
+  .search {
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    > .search-button {
+      height: 42px;
+      border: 1px solid var(--lightgray);
+      border-radius: 8px;
+      background: var(--cryun-surface);
+      padding: 0 14px;
+      gap: 10px;
+      > p {
+        font-size: 0.82rem;
+        color: var(--gray);
+      }
+      > svg {
+        width: 16px;
+        min-width: 16px;
+        height: 16px;
+      }
+      &:hover {
+        border-color: var(--secondary);
+      }
+    }
+  }
+
+  .cryun-header .darkmode,
+  .cryun-header .readermode {
+    display: block;
+    width: 42px;
+    height: 42px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    flex: 0 0 42px;
+    &:hover {
+      background: var(--cryun-soft);
+      border-color: var(--lightgray);
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+      left: 10px;
+      top: 10px;
+    }
+  }
+
+  .cryun-menu {
+    position: relative;
+    display: flex;
+    gap: 26px;
+    align-items: stretch;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    border-top: 1px solid var(--lightgray);
+    border-bottom: 1px solid var(--lightgray);
+    a {
+      flex-shrink: 0;
+      padding: 14px 0 13px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      &:hover {
+        color: var(--secondary);
+      }
+      &[aria-current] {
+        color: var(--secondary);
+        border-bottom-color: var(--secondary);
+      }
+    }
+  }
+
+  .cryun-main {
+    grid-area: grid-center;
+    min-width: 0;
+    width: 100%;
+    outline: none;
+    > .page-footer {
+      margin-top: 24px;
+    }
+    > .page-footer:empty {
+      display: none;
+    }
+  }
+
+  > #quartz-body > .cryun-context.sidebar.right {
+    grid-area: grid-sidebar-right;
+    display: block;
+    align-self: start;
+    position: sticky;
+    top: 24px;
+    height: auto;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding: 0 0 0 24px;
+    border-left: 1px solid var(--lightgray);
+    > summary {
+      display: none;
+    }
+    > .cryun-context-content {
+      max-height: none;
+    }
+  }
+
+  .cryun-context-content {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    > * {
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    h2,
+    h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    .toc {
+      display: block;
+    }
+    .toc-content {
+      max-height: 32vh;
+    }
+    .toc-content a {
+      font-size: 0.78rem;
+      line-height: 1.7;
+      opacity: 1;
+      color: var(--gray);
+      &.in-view {
+        opacity: 1;
+        color: var(--secondary);
+      }
+    }
+    .backlinks ul {
+      padding-left: 0;
+      list-style: none;
+    }
+    .backlinks li {
+      margin: 8px 0;
+    }
+    .backlinks a,
+    .backlinks li {
+      font-size: 0.78rem;
+      line-height: 1.7;
+    }
+    .graph-outer {
+      height: 180px;
+      border-radius: 8px;
+      background: var(--cryun-surface);
+    }
+  }
+
+  > #quartz-body > footer {
+    margin: 40px 0 0;
+    padding: 22px 0 26px;
+    border-top: 1px solid var(--lightgray);
+    opacity: 1;
+    font-size: 0.72rem;
+    color: var(--gray);
+    p {
+      margin: 0 0 6px;
+      color: var(--gray);
+    }
+  }
+
+  :is(a, button, input, summary):focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 4px;
+  }
+  .cryun-skip {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    transform: translateY(-160%);
+    z-index: 10000;
+    padding: 12px 18px;
+    background: var(--cryun-surface);
+    border: 1px solid var(--secondary);
+    border-radius: 8px;
+    &:focus {
+      transform: none;
+    }
+  }
+}
+
+:root[saved-theme="dark"] .page[data-frame="cryun"] {
+  --cryun-surface: #1c222c;
+  --cryun-soft: #252d3a;
+}
+
+:root[reader-mode="on"] .page[data-frame="cryun"] {
+  > #quartz-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "grid-header" "grid-center" "grid-footer";
+    > .cryun-context {
+      display: none;
+    }
+  }
+  .cryun-main {
+    max-width: 960px;
+    min-width: 0;
+  }
+  .readermode {
+    background: var(--highlight);
+    border-color: var(--secondary);
+  }
+}
+
+@media (max-width: 1200px) {
+  .page[data-frame="cryun"] {
+    width: calc(100% - 48px);
+    > #quartz-body {
+      column-gap: 28px;
+      grid-template-columns: minmax(0, 1fr) 230px;
+    }
+    .cryun-menu {
+      gap: 22px;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .page[data-frame="cryun"] {
+    > #quartz-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto 1fr auto;
+      grid-template-areas: "grid-header" "grid-sidebar-right" "grid-center" "grid-footer";
+    }
+    .cryun-header {
+      margin-bottom: 20px;
+    }
+    > #quartz-body > .cryun-context.sidebar.right {
+      position: static;
+      padding: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--lightgray);
+      border-radius: 8px;
+      background: var(--cryun-surface);
+      max-height: none;
+      overflow: visible;
+      > summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 16px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        list-style: none;
+        &::-webkit-details-marker {
+          display: none;
+        }
+      }
+      &[open] > summary {
+        border-bottom: 1px solid var(--lightgray);
+      }
+      &[open] > summary span {
+        transform: rotate(180deg);
+      }
+      > .cryun-context-content {
+        max-height: 60dvh;
+      }
+    }
+    .cryun-context-content {
+      padding: 20px;
+      max-height: 60dvh;
+      overflow-y: auto;
+    }
+    .cryun-context-content .graph {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .page[data-frame="cryun"] {
+    width: calc(100% - 32px);
+    .cryun-header-row {
+      padding: 20px 0;
+    }
+    .cryun-header-tools {
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .cryun-header-tools > .flex-component {
+      width: 100%;
+    }
+    .page-title {
+      font-size: 1.2rem;
+    }
+    .cryun-menu {
+      gap: 22px;
+    }
+    .cryun-menu a {
+      padding: 13px 0 12px;
+      font-size: 0.77rem;
+    }
+    .cryun-header .search > .search-button {
+      height: 44px;
+    }
+    .cryun-header .darkmode,
+    .cryun-header .readermode {
+      width: 44px;
+      height: 44px;
+      flex-basis: 44px;
+      svg {
+        left: 11px;
+        top: 11px;
+      }
+    }
+    > #quartz-body > footer {
+      margin-top: 28px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page[data-frame="cryun"] *,
+  .page[data-frame="cryun"] *::before {
+    transition: none;
+    scroll-behavior: auto;
+  }
+}

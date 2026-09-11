@@ -1,0 +1,78 @@
+.cryun-explorer {
+  h2 {
+    margin: 0 0 14px;
+    font-size: 0.8rem;
+  }
+  .cryun-tree {
+    max-height: 360px;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    margin: 2px 0;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    cursor: pointer;
+    min-height: 30px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .cryun-tree-chevron {
+    flex: 0 0 20px;
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--gray);
+  }
+  details[open] > summary > .cryun-tree-chevron {
+    transform: rotate(90deg);
+  }
+  details > ul {
+    margin: 2px 0 6px 9px;
+    padding-left: 10px;
+    border-left: 1px solid var(--lightgray);
+  }
+  a {
+    display: block;
+    min-width: 0;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--darkgray);
+    line-height: 1.6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  summary > a {
+    flex: 1;
+    padding-left: 0;
+    color: var(--secondary);
+  }
+  a:hover {
+    background: var(--cryun-soft, var(--highlight));
+  }
+  a[aria-current] {
+    color: var(--secondary);
+    background: var(--highlight);
+    font-weight: 600;
+  }
+  @media (max-width: 1000px) {
+    a {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  }
+}

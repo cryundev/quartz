@@ -1,0 +1,36 @@
+{
+  "name": "cryun-theme",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./components": "./dist/components.js",
+    "./frames": "./dist/frame.js"
+  },
+  "quartz": {
+    "name": "cryun-theme",
+    "displayName": "Cryun Theme",
+    "description": "Cryun 위키의 페이지 배치와 반응형 탐색",
+    "version": "1.0.0",
+    "category": [
+      "transformer",
+      "component"
+    ],
+    "components": {
+      "CryunExplorer": {
+        "displayName": "문서 탐색",
+        "defaultPosition": "right",
+        "defaultPriority": 20
+      }
+    },
+    "frames": {
+      "CryunFrame": {
+        "exportName": "CryunFrame"
+      }
+    }
+  }
+}
