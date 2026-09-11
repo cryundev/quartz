@@ -46,7 +46,7 @@ npm run build:site -- -d /path/to/published-notes -o /tmp/quartz-preview
 
 저장소의 `content/index.md`는 버전 관리되는 홈 노트 초안이다. 현재 운영 환경에서는 Docker의 content 바인드에 연결된 `/home/cry/obsidian_vault/cry_publish/index.md`가 실제 원본이다. 게시 후 문구·링크는 해당 Obsidian 노트에서 편집한다. 빌드가 저장소 초안을 운영 Vault에 덮어쓰지 않는다.
 
-`cssclasses: [cryun-home]`는 공식 frontmatter 기능으로 홈 스타일을 선택한다. 제목·소개·주제 링크·추천 문서는 모두 노트에 작성한다. 첫 번째 목록만 카드 형태로 꾸미며, 클래스를 빼면 동일 내용이 일반 문서로 표시된다. 문서 수나 최근 업데이트 목록을 테마 코드가 대신 생성하지 않는다.
+`cssclasses: [cryun-home]`는 공식 frontmatter 기능으로 홈 스타일을 선택한다. 페이지 제목·주제 링크·추천 문서는 모두 노트에 작성한다. 홈은 `title: 홈` 메타데이터를 사용하고, 제목과 날짜·읽기 시간 컴포넌트는 공식 `condition: not-index` 설정으로 홈에서만 제외한다. 홈 본문은 주제별 탐색으로 시작한다. 첫 번째 목록만 카드 형태로 꾸미며, 클래스를 빼면 동일 내용이 일반 문서로 표시된다. 문서 수나 최근 업데이트 목록을 테마 코드가 대신 생성하지 않는다.
 
 [공식 레이아웃 가이드](https://github.com/jackyzha0/quartz/blob/v5/docs/layout.md)에 따라 프레임은 `pageBody`와 각 슬롯을 배치하고, 플러그인의 `./frames` export로 등록한다. 코어와 설치된 커뮤니티 플러그인 소스는 수정하지 않는다. 향후 Quartz가 공개 API를 변경할 가능성까지 없앨 수는 없으므로, 업데이트 때 프레임 슬롯 타입·플러그인 manifest와 아래 동작을 다시 검증한다.
 
