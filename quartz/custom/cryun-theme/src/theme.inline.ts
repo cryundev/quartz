@@ -7,7 +7,10 @@ function setupCryunTheme() {
   if (context) {
     const compact = window.matchMedia("(max-width: 1000px)")
     const updateContext = () => {
-      context.open = !compact.matches
+      // A modal inside a closed details element becomes invisible but stays modal.
+      context.open =
+        !compact.matches ||
+        context.querySelector<HTMLDialogElement>(".cryun-explorer-dialog")?.open === true
     }
     updateContext()
     compact.addEventListener("change", updateContext)

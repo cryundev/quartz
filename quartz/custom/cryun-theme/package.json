@@ -22,8 +22,8 @@
     "components": {
       "CryunExplorer": {
         "displayName": "문서 트리",
-        "defaultPosition": "left",
-        "defaultPriority": 25
+        "defaultPosition": "right",
+        "defaultPriority": 30
       }
     },
     "frames": {

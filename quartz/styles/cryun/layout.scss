@@ -189,8 +189,7 @@
       flex: 0 0 auto;
       min-width: 0;
     }
-    h2,
-    h3 {
+    > :not(.cryun-explorer-control) :is(h2, h3) {
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--dark);
@@ -228,6 +227,25 @@
       height: 252px;
       border-radius: 8px;
       background: var(--cryun-surface);
+    }
+  }
+
+  .cryun-back-to-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-top: 12px;
+    border: 1px solid var(--lightgray);
+    border-radius: 8px;
+    background: var(--light);
+    color: var(--dark);
+    font-size: 0.8rem;
+    font-weight: 400;
+    &:hover {
+      border-color: var(--secondary);
+      color: var(--secondary);
     }
   }
 
@@ -343,12 +361,15 @@
       }
     }
     .cryun-context-content {
-      padding: 20px;
+      padding: 20px 20px 12px;
       max-height: none;
       overflow: visible;
     }
     .cryun-context-content .graph {
       display: none;
+    }
+    .cryun-back-to-top {
+      margin: 0 20px 20px;
     }
   }
 }
