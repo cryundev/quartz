@@ -73,20 +73,6 @@ export const CryunFrame: PageFrame = {
                 <Component {...componentData} />
               ))}
             </div>
-            <a class="cryun-back-to-top" href="#quartz-body">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.6"
-                aria-hidden="true"
-              >
-                <path d="m6 12 6-6 6 6M12 6v14M5 3h14" />
-              </svg>
-              맨 위로
-            </a>
           </details>
         )}
         <Footer {...componentData} />

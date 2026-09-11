@@ -169,10 +169,9 @@
     height: auto;
     max-height: none;
     overflow: visible;
-    padding: 20px;
-    border: 1px solid var(--lightgray);
-    border-radius: var(--cryun-radius);
-    background: var(--cryun-surface);
+    padding: 0;
+    border: none;
+    background: none;
     > summary {
       display: none;
     }
@@ -184,10 +183,21 @@
   .cryun-context-content {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 16px;
     > * {
       flex: 0 0 auto;
       min-width: 0;
+    }
+    > .flex-component,
+    > .cryun-explorer-control {
+      padding: 20px;
+      border: 1px solid var(--lightgray);
+      border-radius: var(--cryun-radius);
+      background: var(--cryun-surface);
+    }
+    > .flex-component:not(:has(.graph, .toc)),
+    > .flex-component > div:not(:has(.graph, .toc)) {
+      display: none;
     }
     > :not(.cryun-explorer-control) :is(h2, h3) {
       font-size: 0.8rem;
@@ -332,9 +342,6 @@
       position: static;
       padding: 0;
       margin-bottom: 24px;
-      border: 1px solid var(--lightgray);
-      border-radius: 8px;
-      background: var(--cryun-surface);
       max-height: none;
       overflow: visible;
       > summary {
@@ -346,12 +353,12 @@
         font-size: 0.8rem;
         font-weight: 500;
         list-style: none;
+        border: 1px solid var(--lightgray);
+        border-radius: 8px;
+        background: var(--cryun-surface);
         &::-webkit-details-marker {
           display: none;
         }
-      }
-      &[open] > summary {
-        border-bottom: 1px solid var(--lightgray);
       }
       &[open] > summary span {
         transform: rotate(180deg);
@@ -361,15 +368,14 @@
       }
     }
     .cryun-context-content {
-      padding: 20px 20px 12px;
+      padding: 16px 0 0;
       max-height: none;
       overflow: visible;
     }
-    .cryun-context-content .graph {
+    .cryun-context-content .graph,
+    .cryun-context-content > .flex-component > div:has(.graph),
+    .cryun-context-content > .flex-component:not(:has(.toc)) {
       display: none;
-    }
-    .cryun-back-to-top {
-      margin: 0 20px 20px;
     }
   }
 }

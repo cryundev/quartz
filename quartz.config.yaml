@@ -84,6 +84,9 @@ plugins:
     layout:
       position: right
       priority: 20
+      group: reading-context
+      groupOptions:
+        align: stretch
       display: all
   - source: github:quartz-community/crawl-links
     enabled: true
@@ -150,6 +153,9 @@ plugins:
     layout:
       position: right
       priority: 10
+      group: reading-context
+      groupOptions:
+        align: stretch
       display: desktop-only
       condition: not-index
   - source: github:quartz-community/search
@@ -276,6 +282,9 @@ plugins:
       display: all
 layout:
   groups:
+    reading-context:
+      direction: column
+      gap: 28px
     toolbar:
       priority: 35
       direction: row
