@@ -59,3 +59,16 @@ npm run build:site -- -d /path/to/published-notes -o /tmp/quartz-preview
 ## 문서 보조 영역 배치
 
 `quartz.config.yaml`에서 우측 순서는 그래프(10) → 목차(20) → 문서 탐색(30)으로 정한다. 백링크는 `afterBody` 슬롯에서 본문 아래에 표시하며, 별도 목록 스크롤을 만들지 않는다. 그래프의 기존 모바일·홈 숨김과 폴더·태그 페이지의 제외 설정은 유지한다. 백링크가 없으면 기본 플러그인 동작에 따라 영역도 숨겨진다.
+
+## 운영 프록시 캐시
+
+`wiki.cryun.pe.kr`의 Nginx Proxy Manager 설정에서는 **Cache Assets를 끄고**, Advanced에 다음을 적용한다.
+
+```nginx
+# Revalidate Quartz assets whose URL stays the same across deployments.
+expires -1;
+```
+
+Quartz의 `index.css`처럼 배포 후에도 URL이 같은 파일을 프록시나 브라우저가 이전 내용으로 제공하지 않도록 `Cache-Control: no-cache`로 재검증한다. 서버 수준의 `add_header`는 NPM의 location 내부 헤더 설정 때문에 상속되지 않을 수 있으므로 실제 응답 헤더를 확인한다. 이미 예전 응답이 캐시된 브라우저에서는 최초 한 번 강력 새로고침이 필요할 수 있다.
+
+배포 확인 시 운영 도메인과 컨테이너가 반환하는 CSS 내용이 같은지 비교한다. 임시 `:9182` 미리보기를 계속 제공한다면 운영 컨테이너의 생성 파일과 함께 갱신한다.
