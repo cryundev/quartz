@@ -1,39 +1,17 @@
+import { setupExplorerDialog } from "./explorer.inline"
+
 function setupCryunTheme() {
   const context = document.querySelector<HTMLDetailsElement>(".cryun-context")
-  if (!context) return
+  setupExplorerDialog()
 
-  const compact = window.matchMedia("(max-width: 1000px)")
-  const updateContext = () => {
-    context.open = !compact.matches
-  }
-  updateContext()
-  compact.addEventListener("change", updateContext)
-  window.addCleanup(() => compact.removeEventListener("change", updateContext))
-
-  const storageKey = "cryun-open-folders"
-  let expanded: string[] = []
-  try {
-    const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? "[]")
-    if (Array.isArray(saved))
-      expanded = saved.filter((value): value is string => typeof value === "string")
-  } catch {
-    /* Navigation still works when browser storage is unavailable. */
-  }
-  const folders = new Set(expanded)
-  for (const folder of context.querySelectorAll<HTMLDetailsElement>("details[data-folder]")) {
-    const slug = folder.dataset.folder!
-    folder.open = folder.dataset.current === "true" || folders.has(slug)
-    const saveExpanded = () => {
-      if (folder.open) folders.add(slug)
-      else folders.delete(slug)
-      try {
-        localStorage.setItem(storageKey, JSON.stringify([...folders]))
-      } catch {
-        /* Optional persistence. */
-      }
+  if (context) {
+    const compact = window.matchMedia("(max-width: 1000px)")
+    const updateContext = () => {
+      context.open = !compact.matches
     }
-    folder.addEventListener("toggle", saveExpanded)
-    window.addCleanup(() => folder.removeEventListener("toggle", saveExpanded))
+    updateContext()
+    compact.addEventListener("change", updateContext)
+    window.addCleanup(() => compact.removeEventListener("change", updateContext))
   }
 
   // Keep the active section visible in the horizontally scrollable mobile menu.

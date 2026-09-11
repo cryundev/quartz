@@ -50,8 +50,11 @@ plugins:
   - source: ./quartz/custom/cryun-theme
     enabled: true
     layout:
-      position: right
-      priority: 30
+      position: left
+      priority: 25
+      group: toolbar
+      groupOptions:
+        shrink: false
   - source: github:quartz-community/created-modified-date
     enabled: true
     options:

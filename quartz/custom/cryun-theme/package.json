@@ -22,8 +22,8 @@
     "components": {
       "CryunExplorer": {
         "displayName": "문서 탐색",
-        "defaultPosition": "right",
-        "defaultPriority": 20
+        "defaultPosition": "left",
+        "defaultPriority": 25
       }
     },
     "frames": {

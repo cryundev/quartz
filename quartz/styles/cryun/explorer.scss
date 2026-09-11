@@ -1,8 +1,4 @@
 .cryun-explorer {
-  h2 {
-    margin: 0 0 14px;
-    font-size: 0.8rem;
-  }
   ul {
     list-style: none;
     padding: 0;
@@ -46,9 +42,8 @@
     font-weight: 400;
     color: var(--darkgray);
     line-height: 1.6;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   summary > a {
     flex: 1;
@@ -68,5 +63,106 @@
       padding-top: 10px;
       padding-bottom: 10px;
     }
+  }
+}
+
+.cryun-explorer-trigger,
+.cryun-explorer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  background: var(--light);
+  color: var(--dark);
+  font-family: var(--bodyFont);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+  &:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+  }
+}
+
+.cryun-explorer-dialog {
+  box-sizing: border-box;
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(720px, calc(100dvh - 48px));
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  border-radius: 14px;
+  background: var(--light);
+  color: var(--dark);
+  box-shadow: 0 24px 80px #0003;
+  overflow: hidden;
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  &::backdrop {
+    background: #10172580;
+    backdrop-filter: blur(3px);
+  }
+  .cryun-explorer-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--lightgray);
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    form {
+      margin: 0;
+    }
+  }
+  .cryun-explorer-close {
+    width: 42px;
+    padding: 0;
+    border-color: transparent;
+  }
+  .cryun-explorer {
+    padding: 12px 24px 24px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .cryun-tree {
+    max-height: none;
+    overflow: visible;
+  }
+  :is(a, button, summary):focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+  }
+}
+
+:root:has(.cryun-explorer-dialog[open]) {
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .cryun-explorer-trigger {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    > span {
+      display: none;
+    }
+  }
+  .cryun-explorer-dialog .cryun-explorer-heading {
+    padding: 12px 16px;
+  }
+  .cryun-explorer-dialog .cryun-explorer {
+    padding: 8px 16px 16px;
   }
 }

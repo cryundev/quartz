@@ -9,13 +9,19 @@
   margin: 0 auto;
 
   > #quartz-body {
-    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-columns: minmax(0, 1fr) 280px;
     grid-template-rows: auto 1fr auto;
     grid-template-areas: "grid-header grid-header" "grid-center grid-sidebar-right" "grid-footer grid-footer";
-    column-gap: 44px;
+    column-gap: 32px;
     row-gap: 0;
     padding: 0;
     min-height: 100svh;
+  }
+
+  > #quartz-body:not(:has(> .cryun-context)) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "grid-header" "grid-center" "grid-footer";
   }
 
   .cryun-header {
@@ -35,7 +41,7 @@
     gap: 32px;
 
     > .flex-component {
-      width: min(460px, 50%);
+      width: min(560px, 60%);
       align-items: center;
     }
   }
@@ -157,15 +163,14 @@
     grid-area: grid-sidebar-right;
     display: block;
     align-self: start;
-    position: sticky;
-    top: 24px;
+    position: static;
     height: auto;
-    max-height: calc(100dvh - 48px);
-    overflow-y: auto;
-    overscroll-behavior: auto;
-    scrollbar-width: thin;
-    padding: 0 0 0 24px;
-    border-left: 1px solid var(--lightgray);
+    max-height: none;
+    overflow: visible;
+    padding: 20px;
+    border: 1px solid var(--lightgray);
+    border-radius: var(--cryun-radius);
+    background: var(--cryun-surface);
     > summary {
       display: none;
     }
@@ -188,7 +193,7 @@
       font-weight: 600;
       color: var(--dark);
     }
-    // The rail owns scrolling; component lists must not create nested scrollers.
+    // The page owns scrolling, including every list in the right-hand context.
     .toc {
       display: block;
       overflow: visible;
@@ -284,8 +289,8 @@
   .page[data-frame="cryun"] {
     width: calc(100% - 48px);
     > #quartz-body {
-      column-gap: 28px;
-      grid-template-columns: minmax(0, 1fr) 230px;
+      column-gap: 24px;
+      grid-template-columns: minmax(0, 1fr) 260px;
     }
     .cryun-menu {
       gap: 22px;

@@ -66,7 +66,7 @@ export const CryunFrame: PageFrame = {
         {right.length > 0 && (
           <details class="cryun-context right sidebar" open>
             <summary>
-              목차 및 문서 탐색<span aria-hidden="true">⌄</span>
+              목차<span aria-hidden="true">⌄</span>
             </summary>
             <div class="cryun-context-content">
               {right.map((Component) => (
