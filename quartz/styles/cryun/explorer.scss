@@ -97,7 +97,8 @@
   box-sizing: border-box;
   width: min(640px, calc(100vw - 32px));
   max-width: none;
-  max-height: min(720px, calc(100dvh - 48px));
+  height: min(720px, calc(100dvh - 48px));
+  max-height: none;
   padding: 0;
   border: 1px solid var(--lightgray);
   border-radius: 14px;
@@ -134,7 +135,76 @@
     padding: 0;
     border-color: transparent;
   }
+  .cryun-explorer-search {
+    flex-shrink: 0;
+    padding: 16px 24px 0;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gray);
+      font-size: 0.75rem;
+    }
+  }
+  .cryun-explorer-search-field {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--lightgray);
+    border-radius: 8px;
+    background: var(--light);
+    &:focus-within {
+      outline: 2px solid var(--secondary);
+      outline-offset: 2px;
+      .cryun-explorer-search-input {
+        outline: none;
+      }
+    }
+  }
+  .cryun-explorer-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    border: none;
+    background: transparent;
+    color: var(--dark);
+    font-family: var(--bodyFont);
+    font-size: 1rem;
+    &::-webkit-search-cancel-button {
+      appearance: none;
+    }
+  }
+  .cryun-explorer-search-clear {
+    display: grid;
+    place-items: center;
+    flex: 0 0 32px;
+    height: 32px;
+    margin-right: 6px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--darkgray);
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    &:enabled:hover {
+      background: var(--highlight);
+    }
+  }
+  .cryun-explorer-search-status {
+    margin: 8px 0 0;
+    color: var(--gray);
+    font-size: 0.72rem;
+  }
+  .cryun-explorer-empty {
+    margin: 16px 0;
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
   .cryun-explorer {
+    flex: 1;
     padding: 12px 24px 24px;
     min-height: 0;
     overflow-y: auto;
@@ -161,5 +231,8 @@
   }
   .cryun-explorer-dialog .cryun-explorer {
     padding: 8px 16px 16px;
+  }
+  .cryun-explorer-dialog .cryun-explorer-search {
+    padding: 12px 16px 0;
   }
 }

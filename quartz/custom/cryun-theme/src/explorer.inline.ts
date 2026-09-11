@@ -1,3 +1,5 @@
+import { setupExplorerTree } from "./explorer-tree.inline"
+
 export function setupExplorerDialog() {
   const dialog = document.querySelector<HTMLDialogElement>(".cryun-explorer-dialog")
   const trigger = document.querySelector<HTMLButtonElement>(".cryun-explorer-trigger")
@@ -31,40 +33,25 @@ export function setupExplorerDialog() {
     )
       dialog.close()
   }
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || event.isComposing) return
+    // Search inputs otherwise consume Escape to clear themselves first.
+    event.preventDefault()
+    event.stopPropagation()
+    dialog.close()
+  }
   trigger.addEventListener("click", open)
   dialog.addEventListener("close", closed)
   dialog.addEventListener("click", dismiss)
+  dialog.addEventListener("keydown", closeOnEscape)
   window.addCleanup(() => {
     trigger.removeEventListener("click", open)
     dialog.removeEventListener("close", closed)
     dialog.removeEventListener("click", dismiss)
+    dialog.removeEventListener("keydown", closeOnEscape)
     // Release the browser's modal state and CSS scroll lock before SPA replacement.
     if (dialog.open) dialog.close()
   })
 
-  const storageKey = "cryun-open-folders"
-  let expanded: string[] = []
-  try {
-    const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? "[]")
-    if (Array.isArray(saved))
-      expanded = saved.filter((value): value is string => typeof value === "string")
-  } catch {
-    /* Navigation still works when browser storage is unavailable. */
-  }
-  const folders = new Set(expanded)
-  for (const folder of dialog.querySelectorAll<HTMLDetailsElement>("details[data-folder]")) {
-    const slug = folder.dataset.folder!
-    folder.open = folder.dataset.current === "true" || folders.has(slug)
-    const saveExpanded = () => {
-      if (folder.open) folders.add(slug)
-      else folders.delete(slug)
-      try {
-        localStorage.setItem(storageKey, JSON.stringify([...folders]))
-      } catch {
-        /* Optional persistence. */
-      }
-    }
-    folder.addEventListener("toggle", saveExpanded)
-    window.addCleanup(() => folder.removeEventListener("toggle", saveExpanded))
-  }
+  setupExplorerTree(dialog)
 }

@@ -98,12 +98,7 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
         <div class="cryun-explorer-heading">
           <h2 id="cryun-explorer-title">문서 트리</h2>
           <form method="dialog">
-            <button
-              type="submit"
-              class="cryun-explorer-close"
-              aria-label="문서 트리 닫기"
-              autofocus
-            >
+            <button type="submit" class="cryun-explorer-close" aria-label="문서 트리 닫기">
               <svg
                 width="20"
                 height="20"
@@ -118,8 +113,49 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
             </button>
           </form>
         </div>
+        <div class="cryun-explorer-search" role="search" aria-label="문서 트리 필터">
+          <label for="cryun-explorer-query">문서명 · 폴더 경로 검색</label>
+          <div class="cryun-explorer-search-field">
+            <input
+              id="cryun-explorer-query"
+              class="cryun-explorer-search-input"
+              type="search"
+              placeholder="검색어를 입력하세요"
+              autocomplete="off"
+              spellcheck={false}
+              aria-controls="cryun-tree-results"
+              autofocus
+            />
+            <button
+              type="button"
+              class="cryun-explorer-search-clear"
+              aria-label="검색어 지우기"
+              disabled
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="m6 6 12 12M18 6 6 18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+              </svg>
+            </button>
+          </div>
+          <p
+            class="cryun-explorer-search-status"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            전체 문서
+          </p>
+        </div>
         <nav class="cryun-explorer" aria-label="문서 트리">
-          <div class="cryun-tree">
+          <p class="cryun-explorer-empty" hidden>
+            일치하는 문서나 폴더가 없습니다.
+          </p>
+          <div id="cryun-tree-results" class="cryun-tree">
             <ExplorerTree node={ctx.trie} current={fileData.slug} />
           </div>
         </nav>
