@@ -189,14 +189,12 @@
       color: var(--dark);
     }
     // The rail owns scrolling; component lists must not create nested scrollers.
-    .toc,
-    .backlinks {
+    .toc {
       display: block;
       overflow: visible;
       max-height: none;
     }
-    .toc-content.overflow,
-    .backlinks > ul.overflow {
+    .toc-content.overflow {
       max-height: none;
       overflow: visible;
       overscroll-behavior: auto;
@@ -214,18 +212,6 @@
         opacity: 1;
         color: var(--secondary);
       }
-    }
-    .backlinks ul {
-      padding-left: 0;
-      list-style: none;
-    }
-    .backlinks li {
-      margin: 8px 0;
-    }
-    .backlinks a,
-    .backlinks li {
-      font-size: 0.78rem;
-      line-height: 1.7;
     }
     .graph-container canvas {
       display: block;

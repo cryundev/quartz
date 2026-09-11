@@ -11,6 +11,34 @@
       margin-right: auto;
     }
   }
+  .cryun-main > .page-footer > .backlinks {
+    padding: 24px;
+    border: 1px solid var(--lightgray);
+    border-radius: var(--cryun-radius);
+    background: var(--cryun-surface);
+    max-height: none;
+    overflow: visible;
+    > h3 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      color: var(--dark);
+    }
+    > ul.overflow {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      max-height: none;
+      overflow: visible;
+      overscroll-behavior: auto;
+      mask-image: none;
+    }
+    li {
+      margin: 8px 0;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+  }
   .cryun-document-heading {
     margin-bottom: 32px;
     padding-bottom: 24px;

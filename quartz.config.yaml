@@ -51,7 +51,7 @@ plugins:
     enabled: true
     layout:
       position: right
-      priority: 20
+      priority: 30
   - source: github:quartz-community/created-modified-date
     enabled: true
     options:
@@ -83,7 +83,7 @@ plugins:
     order: 50
     layout:
       position: right
-      priority: 10
+      priority: 20
       display: all
   - source: github:quartz-community/crawl-links
     enabled: true
@@ -149,7 +149,7 @@ plugins:
         zoom: false
     layout:
       position: right
-      priority: 40
+      priority: 10
       display: desktop-only
       condition: not-index
   - source: github:quartz-community/search
@@ -163,8 +163,8 @@ plugins:
   - source: github:quartz-community/backlinks
     enabled: true
     layout:
-      position: right
-      priority: 30
+      position: afterBody
+      priority: 10
   - source: github:quartz-community/article-title
     enabled: true
     layout:
