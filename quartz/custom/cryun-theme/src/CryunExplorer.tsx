@@ -70,11 +70,11 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
       <button
         type="button"
         class="cryun-explorer-trigger"
-        aria-label="문서 탐색"
+        aria-label="문서 트리"
         aria-haspopup="dialog"
         aria-controls="cryun-explorer-dialog"
         aria-expanded="false"
-        title="문서 탐색"
+        title="문서 트리"
       >
         <svg
           width="20"
@@ -88,7 +88,7 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
           <path d="M3 7V4h6l2 3h10v13H3V7Z" />
           <path d="M7 11v5h3m-3-3h7m0 3h3" />
         </svg>
-        <span>문서 탐색</span>
+        <span>문서 트리</span>
       </button>
       <dialog
         id="cryun-explorer-dialog"
@@ -96,12 +96,12 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
         aria-labelledby="cryun-explorer-title"
       >
         <div class="cryun-explorer-heading">
-          <h2 id="cryun-explorer-title">문서 탐색</h2>
+          <h2 id="cryun-explorer-title">문서 트리</h2>
           <form method="dialog">
             <button
               type="submit"
               class="cryun-explorer-close"
-              aria-label="문서 탐색 닫기"
+              aria-label="문서 트리 닫기"
               autofocus
             >
               <svg
@@ -118,7 +118,7 @@ export function Explorer({ ctx, fileData }: QuartzComponentProps) {
             </button>
           </form>
         </div>
-        <nav class="cryun-explorer" aria-label="문서 탐색">
+        <nav class="cryun-explorer" aria-label="문서 트리">
           <div class="cryun-tree">
             <ExplorerTree node={ctx.trie} current={fileData.slug} />
           </div>

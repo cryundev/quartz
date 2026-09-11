@@ -21,7 +21,7 @@
     ],
     "components": {
       "CryunExplorer": {
-        "displayName": "문서 탐색",
+        "displayName": "문서 트리",
         "defaultPosition": "left",
         "defaultPriority": 25
       }
