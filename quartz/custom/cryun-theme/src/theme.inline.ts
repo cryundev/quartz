@@ -12,6 +12,13 @@ function setupCryunTheme() {
     updateContext()
     compact.addEventListener("change", updateContext)
     window.addCleanup(() => compact.removeEventListener("change", updateContext))
+
+    // Keep long TOCs reachable when the card is taller than the viewport.
+    const resizeObserver = new ResizeObserver(() => {
+      context.style.setProperty("--cryun-context-height", `${context.offsetHeight}px`)
+    })
+    resizeObserver.observe(context)
+    window.addCleanup(() => resizeObserver.disconnect())
   }
 
   // Keep the active section visible in the horizontally scrollable mobile menu.

@@ -163,7 +163,9 @@
     grid-area: grid-sidebar-right;
     display: block;
     align-self: start;
-    position: static;
+    position: sticky;
+    // Tall cards scroll into view before sticking, without an inner scrollbar.
+    top: min(24px, calc(100dvh - var(--cryun-context-height, 0px) - 24px));
     height: auto;
     max-height: none;
     overflow: visible;
