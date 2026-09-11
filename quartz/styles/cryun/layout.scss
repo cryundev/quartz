@@ -162,7 +162,7 @@
     height: auto;
     max-height: calc(100dvh - 48px);
     overflow-y: auto;
-    overscroll-behavior: contain;
+    overscroll-behavior: auto;
     scrollbar-width: thin;
     padding: 0 0 0 24px;
     border-left: 1px solid var(--lightgray);
@@ -188,11 +188,22 @@
       font-weight: 600;
       color: var(--dark);
     }
-    .toc {
+    // The rail owns scrolling; component lists must not create nested scrollers.
+    .toc,
+    .backlinks {
       display: block;
+      overflow: visible;
+      max-height: none;
     }
-    .toc-content {
-      max-height: 32vh;
+    .toc-content.overflow,
+    .backlinks > ul.overflow {
+      max-height: none;
+      overflow: visible;
+      overscroll-behavior: auto;
+      mask-image: none;
+    }
+    .toc-content.collapsed {
+      display: none;
     }
     .toc-content a {
       font-size: 0.78rem;
@@ -216,8 +227,12 @@
       font-size: 0.78rem;
       line-height: 1.7;
     }
+    .graph-container canvas {
+      display: block;
+    }
     .graph-outer {
-      height: 180px;
+      // The graph plugin renders a canvas at least 250px tall, plus borders.
+      height: 252px;
       border-radius: 8px;
       background: var(--cryun-surface);
     }
@@ -331,13 +346,13 @@
         transform: rotate(180deg);
       }
       > .cryun-context-content {
-        max-height: 60dvh;
+        max-height: none;
       }
     }
     .cryun-context-content {
       padding: 20px;
-      max-height: 60dvh;
-      overflow-y: auto;
+      max-height: none;
+      overflow: visible;
     }
     .cryun-context-content .graph {
       display: none;

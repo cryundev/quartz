@@ -49,7 +49,6 @@ configuration:
 plugins:
   - source: ./quartz/custom/cryun-theme
     enabled: true
-    order: 100
     layout:
       position: right
       priority: 20
@@ -145,6 +144,9 @@ plugins:
       priority: 20
   - source: github:quartz-community/graph
     enabled: true
+    options:
+      localGraph:
+        zoom: false
     layout:
       position: right
       priority: 40
