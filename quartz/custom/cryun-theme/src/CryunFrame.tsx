@@ -1,8 +1,6 @@
 import { pathToRoot, resolveRelative } from "@quartz-community/utils"
-import type { Root } from "hast"
 import type { PageFrame } from "../../../components/frames"
-import { getLibrary } from "./library"
-import { LibraryHome } from "./LibraryHome"
+import { getNavigationSections } from "./navigation"
 
 export const CryunFrame: PageFrame = {
   name: "cryun",
@@ -16,13 +14,10 @@ export const CryunFrame: PageFrame = {
     right,
     footer: Footer,
   }) {
-    const { fileData, allFiles, tree } = componentData
+    const { fileData, allFiles } = componentData
     const root = pathToRoot(fileData.slug!)
     const isHome = fileData.slug === "index"
-    const emptyHome =
-      isHome &&
-      (tree as Root).children.every((node) => node.type === "text" && node.value.trim() === "")
-    const { sections } = getLibrary(allFiles)
+    const sections = getNavigationSections(allFiles)
     return (
       <>
         <a class="cryun-skip" href="#cryun-main">
@@ -53,23 +48,15 @@ export const CryunFrame: PageFrame = {
             ))}
           </nav>
         </header>
-        <main
-          id="cryun-main"
-          class={`center cryun-main${emptyHome ? " cryun-main-home" : ""}`}
-          tabIndex={-1}
-        >
-          {emptyHome ? (
-            <LibraryHome {...componentData} />
-          ) : (
-            <div class="cryun-document">
-              <div class="cryun-document-heading popover-hint">
-                {beforeBody.map((Component) => (
-                  <Component {...componentData} />
-                ))}
-              </div>
-              <Content {...componentData} />
+        <main id="cryun-main" class="center cryun-main" tabIndex={-1}>
+          <div class="cryun-document">
+            <div class="cryun-document-heading popover-hint">
+              {beforeBody.map((Component) => (
+                <Component {...componentData} />
+              ))}
             </div>
-          )}
+            <Content {...componentData} />
+          </div>
           <div class="page-footer">
             {afterBody.map((Component) => (
               <Component {...componentData} />

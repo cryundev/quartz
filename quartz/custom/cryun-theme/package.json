@@ -17,7 +17,6 @@
     "description": "Cryun 위키의 페이지 배치와 반응형 탐색",
     "version": "1.0.0",
     "category": [
-      "transformer",
       "component"
     ],
     "components": {
